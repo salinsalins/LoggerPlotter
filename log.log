@@ -61,3 +61,28 @@ java.io.FileNotFoundException: config.dat (Не удается найти ука
 2016-06-10 16:46:15,218 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 352 - Config restored.
 2016-06-10 16:46:17,328 [Timer-1] TRACE binp.nbi.tango.adc.DirWatcher 697 - Logfile length has increaed.
 2016-06-10 16:48:05,843 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 416 - Config saved.
+2016-06-10 20:45:36,469 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 103 - LoggerPlotter 3.0 started.
+2016-06-10 20:45:36,526 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 354 - Config restored.
+2016-06-10 20:46:07,627 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 418 - Config saved.
+2016-06-10 20:47:25,453 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 103 - LoggerPlotter 3.0 started.
+2016-06-10 20:47:25,506 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 354 - Config restored.
+2016-06-10 20:47:37,175 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 219 - Using file C:\Users\sanin\OneDrive\Документы\data\2016\2016-06\2016-06-03 Profile\logfile.log
+2016-06-10 20:47:39,179 [Timer-2] TRACE binp.nbi.tango.adc.DirWatcher 699 - Logfile length has increaed.
+2016-06-10 20:48:00,931 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 418 - Config saved.
+2016-06-10 20:50:06,024 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 103 - LoggerPlotter 3.0 started.
+2016-06-10 20:50:06,095 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 354 - Config restored.
+2016-06-10 20:50:15,773 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 219 - Using file C:\Users\sanin\OneDrive\Документы\data\2016\2016-05\2016-05-17\2016-05-17.log
+2016-06-10 20:50:17,780 [Timer-2] TRACE binp.nbi.tango.adc.DirWatcher 699 - Logfile length has increaed.
+2016-06-10 20:51:00,045 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 219 - Using file C:\Users\sanin\OneDrive\Документы\data\2016\2016-05\2016-05-16\2016-05-16.log
+2016-06-10 20:51:02,045 [Timer-3] TRACE binp.nbi.tango.adc.DirWatcher 699 - Logfile length has increaed.
+2016-06-10 20:51:19,036 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 219 - Using file C:\Users\sanin\OneDrive\Документы\data\2016\2016-05\2016-05-13\2016-05-13.log
+2016-06-10 20:51:21,040 [Timer-4] TRACE binp.nbi.tango.adc.DirWatcher 699 - Logfile length has increaed.
+2016-06-10 20:55:14,056 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 418 - Config saved.
+2016-06-10 20:55:21,399 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 103 - LoggerPlotter 3.0 started.
+2016-06-10 20:55:21,457 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 354 - Config restored.
+2016-06-10 20:55:23,467 [Timer-1] TRACE binp.nbi.tango.adc.DirWatcher 699 - Logfile length has increaed.
+2016-06-10 20:56:08,812 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 418 - Config saved.
+2016-06-10 20:56:19,240 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 103 - LoggerPlotter 3.0 started.
+2016-06-10 20:56:19,277 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 354 - Config restored.
+2016-06-10 20:56:21,287 [Timer-1] TRACE binp.nbi.tango.adc.DirWatcher 699 - Logfile length has increaed.
+2016-06-10 20:56:26,632 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 418 - Config saved.

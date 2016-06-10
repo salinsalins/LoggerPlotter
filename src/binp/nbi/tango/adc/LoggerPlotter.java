@@ -41,6 +41,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -96,6 +97,7 @@ public class LoggerPlotter extends WindowAdapter {
             @Override
             public void run() {
                 try {
+                    //UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
                     window = new LoggerPlotter();
                     window.frame.setVisible(true);
                     log.trace("LoggerPlotter " + version + " started.");
