@@ -1,0 +1,59 @@
+2016-06-09 17:14:54,130 [AWT-EventQueue-0] INFO  binp.nbi.tango.adc.LoggerPlotter 100 - LoggerPlotter 3.0 started.
+2016-06-09 17:14:54,208 [AWT-EventQueue-0] ERROR binp.nbi.tango.adc.LoggerPlotter 353 - Config read error 
+java.io.FileNotFoundException: config.dat (Не удается найти указанный файл)
+	at java.io.FileInputStream.open(Native Method) ~[?:1.7.0_80]
+	at java.io.FileInputStream.<init>(FileInputStream.java:146) ~[?:1.7.0_80]
+	at java.io.FileInputStream.<init>(FileInputStream.java:101) ~[?:1.7.0_80]
+	at binp.nbi.tango.adc.LoggerPlotter.restoreConfig(LoggerPlotter.java:323) [classes/:?]
+	at binp.nbi.tango.adc.LoggerPlotter.windowOpened(LoggerPlotter.java:423) [classes/:?]
+	at java.awt.AWTEventMulticaster.windowOpened(AWTEventMulticaster.java:339) [?:1.7.0_80]
+	at java.awt.Window.processWindowEvent(Window.java:2048) [?:1.7.0_80]
+	at javax.swing.JFrame.processWindowEvent(JFrame.java:296) [?:1.7.0_80]
+	at java.awt.Window.processEvent(Window.java:2009) [?:1.7.0_80]
+	at java.awt.Component.dispatchEventImpl(Component.java:4872) [?:1.7.0_80]
+	at java.awt.Container.dispatchEventImpl(Container.java:2287) [?:1.7.0_80]
+	at java.awt.Window.dispatchEventImpl(Window.java:2719) [?:1.7.0_80]
+	at java.awt.Component.dispatchEvent(Component.java:4698) [?:1.7.0_80]
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:747) [?:1.7.0_80]
+	at java.awt.EventQueue.access$300(EventQueue.java:103) [?:1.7.0_80]
+	at java.awt.EventQueue$3.run(EventQueue.java:706) [?:1.7.0_80]
+	at java.awt.EventQueue$3.run(EventQueue.java:704) [?:1.7.0_80]
+	at java.security.AccessController.doPrivileged(Native Method) ~[?:1.7.0_80]
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76) [?:1.7.0_80]
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:87) [?:1.7.0_80]
+	at java.awt.EventQueue$4.run(EventQueue.java:720) [?:1.7.0_80]
+	at java.awt.EventQueue$4.run(EventQueue.java:718) [?:1.7.0_80]
+	at java.security.AccessController.doPrivileged(Native Method) ~[?:1.7.0_80]
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76) [?:1.7.0_80]
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:717) [?:1.7.0_80]
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242) [?:1.7.0_80]
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161) [?:1.7.0_80]
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150) [?:1.7.0_80]
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146) [?:1.7.0_80]
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138) [?:1.7.0_80]
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91) [?:1.7.0_80]
+2016-06-09 17:15:54,052 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 214 - Using file D:\Мои документы\TAE\2016\2016-06\2016-06-08\2016-06-08.log
+2016-06-09 17:17:08,349 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 410 - Config saved.
+2016-06-09 17:21:57,880 [AWT-EventQueue-0] INFO  binp.nbi.tango.adc.LoggerPlotter 100 - LoggerPlotter 3.0 started.
+2016-06-09 17:21:57,943 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 350 - Config restored.
+2016-06-09 17:22:38,286 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 410 - Config saved.
+2016-06-09 17:23:50,708 [AWT-EventQueue-0] INFO  binp.nbi.tango.adc.LoggerPlotter 100 - LoggerPlotter 3.0 started.
+2016-06-09 17:23:50,771 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 350 - Config restored.
+2016-06-09 17:24:55,005 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 410 - Config saved.
+2016-06-09 17:25:23,177 [AWT-EventQueue-0] INFO  binp.nbi.tango.adc.LoggerPlotter 100 - LoggerPlotter 3.0 started.
+2016-06-09 17:25:23,240 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 350 - Config restored.
+2016-06-09 17:26:25,224 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 410 - Config saved.
+2016-06-09 17:26:33,224 [AWT-EventQueue-0] INFO  binp.nbi.tango.adc.LoggerPlotter 100 - LoggerPlotter 3.0 started.
+2016-06-09 17:26:33,286 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 350 - Config restored.
+2016-06-09 17:27:33,099 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 410 - Config saved.
+2016-06-09 17:27:37,365 [AWT-EventQueue-0] INFO  binp.nbi.tango.adc.LoggerPlotter 100 - LoggerPlotter 3.0 started.
+2016-06-09 17:27:37,443 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 350 - Config restored.
+2016-06-09 17:30:06,443 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 410 - Config saved.
+2016-06-09 17:44:51,318 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 101 - LoggerPlotter 3.0 started.
+2016-06-09 17:44:51,380 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 352 - Config restored.
+2016-06-09 17:44:53,396 [Timer-1] TRACE binp.nbi.tango.adc.DirWatcher 697 - Logfile length has increaed.
+2016-06-09 17:45:24,896 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 416 - Config saved.
+2016-06-09 17:45:36,161 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 101 - LoggerPlotter 3.0 started.
+2016-06-09 17:45:36,208 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 352 - Config restored.
+2016-06-09 17:45:38,224 [Timer-1] TRACE binp.nbi.tango.adc.DirWatcher 697 - Logfile length has increaed.
+2016-06-09 17:46:21,349 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 416 - Config saved.

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+	<Appenders>
+		<!-- File appender -->
+		<File name="file" fileName="log.log">
+			<PatternLayout pattern="%d [%t] %-5level %logger{36} %L - %msg%n" />
+		</File>
+		<!-- Console appender -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d [%t] %-5level %logger{36} %L - %msg%n" />
+		</Console>
+	</Appenders>
+
+	<Loggers>
+		<!-- Root logger -->
+		<Root level="trace">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="file" />
+		</Root>
+	</Loggers>
+
+</Configuration> 
