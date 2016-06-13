@@ -24,6 +24,7 @@ public class FileOpenPanel extends JPanel {
     private File file;
 
     public FileOpenPanel(String title, final FileNameExtensionFilter filter) {
+        super();
         setBorder(new TitledBorder(new EtchedBorder(
                         EtchedBorder.LOWERED, null, null), title,
                         TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -100,7 +101,7 @@ public class FileOpenPanel extends JPanel {
         file = new File(fileName);
     }
 
-    public File getFolder(String folderName) {
+    public File getFolder() {
         return file.getParentFile();
     }
 
