@@ -67,8 +67,8 @@ public class LoggerPlotter extends WindowAdapter {
 
     String folder = ".\\";
 
-    DirWatcher myTask = null;
-    Timer myTimer = new Timer();
+    DirWatcher timerTask = null;
+    Timer timer = new Timer();
 
     static LoggerPlotter window;
     private JFrame frame;
@@ -114,7 +114,6 @@ public class LoggerPlotter extends WindowAdapter {
      */
     public LoggerPlotter() {
         initialize();
-        //restoreConfig();
     }
 
     /**
@@ -221,10 +220,10 @@ public class LoggerPlotter extends WindowAdapter {
                     txtFileName.setText(logFileName);
                     logViewTable.readFile(logFileName);
 
-                    myTimer.cancel();
-                    myTask = new DirWatcher(window);
-                    myTimer = new Timer();
-                    myTimer.schedule(myTask, 2000, 1000);
+                    timer.cancel();
+                    timerTask = new DirWatcher(window);
+                    timer = new Timer();
+                    timer.schedule(timerTask, 2000, 1000);
 
                     //String zipFileName = "f:\\eclipse\\data\\2015-12-10\\2015-12-10_172642.zip";
                     //System.out.println(folder + "\\" + logViewTable.files.getLast().getName());
@@ -356,10 +355,10 @@ public class LoggerPlotter extends WindowAdapter {
         } catch (IOException | ClassNotFoundException e) {
             log.error("Config read error ", e);
         }
-        myTimer.cancel();
-        myTimer = new Timer();
-        myTask = new DirWatcher(window);
-        myTimer.schedule(myTask, 2000, 1000);
+        timer.cancel();
+        timer = new Timer();
+        timerTask = new DirWatcher(window);
+        timer.schedule(timerTask, 2000, 1000);
 
         // Add event listener for logview table
         ListSelectionModel rowSM = logViewTable.getSelectionModel();
@@ -381,7 +380,7 @@ public class LoggerPlotter extends WindowAdapter {
                     try {
                         File zipFile = logViewTable.files.get(selectedRow);
                         readZipFile(zipFile);
-                        if (myTask != null && myTask.timerCount > 0) {
+                        if (timerTask != null && timerTask.timerCount > 0) {
                             dimLineColor();
                         }
                     } catch (Exception e) {
@@ -396,7 +395,7 @@ public class LoggerPlotter extends WindowAdapter {
     }
 
     private void saveConfig() {
-        myTimer.cancel();
+        timer.cancel();
 
         Rectangle bounds = frame.getBounds();
         String txt = txtFileName.getText();
@@ -614,6 +613,7 @@ public class LoggerPlotter extends WindowAdapter {
             return false;
         }
     }
+
 }
 
 class DirWatcher extends TimerTask {
