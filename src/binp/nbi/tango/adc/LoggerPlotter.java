@@ -102,8 +102,8 @@ public class LoggerPlotter extends WindowAdapter {
                     window.frame.setVisible(true);
                     log.trace("LoggerPlotter " + version + " started.");
                 } catch (Exception e) {
-                    log.error("LoggerPlotter start error ", e);
-                    //e.printStackTrace();
+                    //log.error("LoggerPlotter start error ", e);
+                    e.printStackTrace();
                 }
             }
         });
@@ -133,6 +133,7 @@ public class LoggerPlotter extends WindowAdapter {
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         frame.getContentPane().add(tabbedPane, "name_5266296004328937");
 
+    // Signals and Log Tab		
         JSplitPane splitPane = new JSplitPane();
         splitPane.setResizeWeight(0.9);
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -167,7 +168,7 @@ public class LoggerPlotter extends WindowAdapter {
                 //log.trace("Reread file for logViewTable");
             }
         });
-// Config Tab		
+    // Config Tab		
         JPanel configPane = new JPanel();
         tabbedPane.addTab("Configuraton", null, configPane, null);
         configPane.setLayout(null);
@@ -414,7 +415,6 @@ public class LoggerPlotter extends WindowAdapter {
             objOStrm.writeObject(sm);
             objOStrm.writeObject(sp);
             objOStrm.close();
-
             log.trace("Config saved.");
         } catch (IOException e) {
             log.error("Config write error ", e);

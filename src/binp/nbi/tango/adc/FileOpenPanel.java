@@ -1,6 +1,5 @@
 package binp.nbi.tango.adc;
 
-import java.awt.LayoutManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -16,90 +15,96 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class FileOpenPanel extends JPanel {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8871748358055212398L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8871748358055212398L;
+    private JTextField txtFileName = null;
+    private JButton btnOpenFile = null;
+    private File file;
 
-	private JTextField txtFileName = null;
-	private JButton btnOpenFile = null;
+    public FileOpenPanel(String title, final FileNameExtensionFilter filter) {
+        setBorder(new TitledBorder(new EtchedBorder(
+                        EtchedBorder.LOWERED, null, null), title,
+                        TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-	protected String folder;
+        SpringLayout layout = new SpringLayout();
+        setLayout(layout);
 
-	public FileOpenPanel() {
-		// TODO Auto-generated constructor stub
-		// Open file panel
-		setBorder(new TitledBorder(new EtchedBorder(
-				EtchedBorder.LOWERED, null, null), "Open File",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        // Open file name text field in open file panel 
+        txtFileName = new JTextField();
+        layout.putConstraint(SpringLayout.NORTH, txtFileName,
+                        5, SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.SOUTH, txtFileName,
+                        -5, SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.EAST, txtFileName,
+                        -55, SpringLayout.EAST, this);
+        layout.putConstraint(SpringLayout.WEST, txtFileName, 5,
+                        SpringLayout.WEST, this);
+        add(txtFileName);
 
-		SpringLayout layout = new SpringLayout();
-		setLayout(layout);
-		// Open file name text field in open file panel 
-		txtFileName = new JTextField();
-		layout.putConstraint(SpringLayout.NORTH, txtFileName,
-				5, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.SOUTH, txtFileName,
-				-5, SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.EAST, txtFileName,
-				-55, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.WEST, txtFileName, 5,
-				SpringLayout.WEST, this);
-		add(txtFileName);
-	
-		// Select file button in open file panel 
-		btnOpenFile = new JButton("...");
-		layout.putConstraint(SpringLayout.NORTH, btnOpenFile, 5,
-				SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.SOUTH, btnOpenFile, -5,
-				SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.EAST, btnOpenFile, -5,
-				SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.WEST, btnOpenFile, 5,
-				SpringLayout.EAST, txtFileName);
+        // Select file button in open file panel 
+        btnOpenFile = new JButton("...");
+        layout.putConstraint(SpringLayout.NORTH, btnOpenFile, 5,
+                        SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.SOUTH, btnOpenFile, -5,
+                        SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.EAST, btnOpenFile, -5,
+                        SpringLayout.EAST, this);
+        layout.putConstraint(SpringLayout.WEST, btnOpenFile, 5,
+                        SpringLayout.EAST, txtFileName);
+        add(btnOpenFile);
+        // Click event for select file button - open file dialog 
+        btnOpenFile.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                JFileChooser fileChooser = new JFileChooser();
+                //FileNameExtensionFilter filter;
+                //filter = new FileNameExtensionFilter("Log file", "log");
+                fileChooser.setFileFilter(filter);
+                fileChooser.setCurrentDirectory(file.getParentFile());
+                int result = fileChooser.showDialog(null, "Open File");
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    file = fileChooser.getSelectedFile();
+                    txtFileName.setText(file.getPath());
+                }
+            }
+        });          
+    }
 
-		// Click event for select file button - open file dialog 
-		btnOpenFile.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				JFileChooser fileChooser = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter(
-						"Log File", "log");
-				fileChooser.setFileFilter(filter);
-				fileChooser.setCurrentDirectory(new File(folder));
-				int result = fileChooser.showDialog(null, "Open File");
-				if (result == JFileChooser.APPROVE_OPTION) {
-					File file = fileChooser.getSelectedFile();
-					txtFileName.setText(file.getPath());
-					folder = file.getParent();
+    public FileOpenPanel() {
+        this("Select Log File", new FileNameExtensionFilter("Log file", "log"));
+    }
 
-					//logViewTable.readFile(file.getPath());
+    public void setText(String txt){
+        txtFileName.setText(txt);
+    }
 
-					//myTimer.cancel();
-					//myTask = new DirWatcher(window);
-					//myTimer = new Timer();
-					//myTimer.schedule(myTask, 2000, 1000);
+    public String getText() {
+        return txtFileName.getText();
+    }
 
-					//readZipFileList(folder + "\\" + logViewTable.files.getLast()); 
-				}
-			}
-		});
-		add(btnOpenFile);
-	}
+    public File getFile() {
+        return file;
+    }
+    
+    public String getFileName() {
+        return file.getName();
+    }
+    
+    public void setFile(File newFile) {
+        file = newFile;
+    }
 
-	public FileOpenPanel(LayoutManager arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
-	}
+    public void setFile(String fileName) {
+        file = new File(fileName);
+    }
 
-	public FileOpenPanel(boolean arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
-	}
+    public File getFolder(String folderName) {
+        return file.getParentFile();
+    }
 
-	public FileOpenPanel(LayoutManager arg0, boolean arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
+    public String getFolderName() {
+        return file.getParent();
+    }
 }
