@@ -61,3 +61,7 @@ java.io.FileNotFoundException: config.dat (Не удается найти ука
 2016-06-10 16:46:15,218 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 352 - Config restored.
 2016-06-10 16:46:17,328 [Timer-1] TRACE binp.nbi.tango.adc.DirWatcher 697 - Logfile length has increaed.
 2016-06-10 16:48:05,843 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 416 - Config saved.
+2016-06-14 07:58:54,484 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 101 - LoggerPlotter 3.0 started.
+2016-06-14 07:58:54,609 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 352 - Config restored.
+2016-06-14 07:58:56,687 [Timer-1] TRACE binp.nbi.tango.adc.DirWatcher 697 - Logfile length has increaed.
+2016-06-14 07:59:41,906 [AWT-EventQueue-0] TRACE binp.nbi.tango.adc.LoggerPlotter 416 - Config saved.
