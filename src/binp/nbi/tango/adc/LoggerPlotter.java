@@ -41,6 +41,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -66,8 +67,8 @@ public class LoggerPlotter extends WindowAdapter {
 
     String folder = ".\\";
 
-    DirWatcher myTask = null;
-    Timer myTimer = new Timer();
+    DirWatcher timerTask = null;
+    Timer timer = new Timer();
 
     static LoggerPlotter window;
     private JFrame frame;
@@ -96,12 +97,13 @@ public class LoggerPlotter extends WindowAdapter {
             @Override
             public void run() {
                 try {
+                    //UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
                     window = new LoggerPlotter();
                     window.frame.setVisible(true);
                     log.trace("LoggerPlotter " + version + " started.");
                 } catch (Exception e) {
-                    log.error("LoggerPlotter start error ", e);
-                    //e.printStackTrace();
+                    //log.error("LoggerPlotter start error ", e);
+                    e.printStackTrace();
                 }
             }
         });
@@ -112,7 +114,6 @@ public class LoggerPlotter extends WindowAdapter {
      */
     public LoggerPlotter() {
         initialize();
-        //restoreConfig();
     }
 
     /**
@@ -131,6 +132,7 @@ public class LoggerPlotter extends WindowAdapter {
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         frame.getContentPane().add(tabbedPane, "name_5266296004328937");
 
+    // Signals and Log Tab		
         JSplitPane splitPane = new JSplitPane();
         splitPane.setResizeWeight(0.9);
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -165,7 +167,7 @@ public class LoggerPlotter extends WindowAdapter {
                 //log.trace("Reread file for logViewTable");
             }
         });
-// Config Tab		
+    // Config Tab		
         JPanel configPane = new JPanel();
         tabbedPane.addTab("Configuraton", null, configPane, null);
         configPane.setLayout(null);
@@ -218,10 +220,10 @@ public class LoggerPlotter extends WindowAdapter {
                     txtFileName.setText(logFileName);
                     logViewTable.readFile(logFileName);
 
-                    myTimer.cancel();
-                    myTask = new DirWatcher(window);
-                    myTimer = new Timer();
-                    myTimer.schedule(myTask, 2000, 1000);
+                    timer.cancel();
+                    timerTask = new DirWatcher(window);
+                    timer = new Timer();
+                    timer.schedule(timerTask, 2000, 1000);
 
                     //String zipFileName = "f:\\eclipse\\data\\2015-12-10\\2015-12-10_172642.zip";
                     //System.out.println(folder + "\\" + logViewTable.files.getLast().getName());
@@ -353,10 +355,10 @@ public class LoggerPlotter extends WindowAdapter {
         } catch (IOException | ClassNotFoundException e) {
             log.error("Config read error ", e);
         }
-        myTimer.cancel();
-        myTimer = new Timer();
-        myTask = new DirWatcher(window);
-        myTimer.schedule(myTask, 2000, 1000);
+        timer.cancel();
+        timer = new Timer();
+        timerTask = new DirWatcher(window);
+        timer.schedule(timerTask, 2000, 1000);
 
         // Add event listener for logview table
         ListSelectionModel rowSM = logViewTable.getSelectionModel();
@@ -378,7 +380,7 @@ public class LoggerPlotter extends WindowAdapter {
                     try {
                         File zipFile = logViewTable.files.get(selectedRow);
                         readZipFile(zipFile);
-                        if (myTask != null && myTask.timerCount > 0) {
+                        if (timerTask != null && timerTask.timerCount > 0) {
                             dimLineColor();
                         }
                     } catch (Exception e) {
@@ -393,7 +395,7 @@ public class LoggerPlotter extends WindowAdapter {
     }
 
     private void saveConfig() {
-        myTimer.cancel();
+        timer.cancel();
 
         Rectangle bounds = frame.getBounds();
         String txt = txtFileName.getText();
@@ -412,7 +414,6 @@ public class LoggerPlotter extends WindowAdapter {
             objOStrm.writeObject(sm);
             objOStrm.writeObject(sp);
             objOStrm.close();
-
             log.trace("Config saved.");
         } catch (IOException e) {
             log.error("Config write error ", e);
@@ -612,6 +613,7 @@ public class LoggerPlotter extends WindowAdapter {
             return false;
         }
     }
+
 }
 
 class DirWatcher extends TimerTask {
