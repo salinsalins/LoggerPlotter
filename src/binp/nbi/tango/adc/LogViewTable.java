@@ -1,5 +1,6 @@
 package binp.nbi.tango.adc;
 
+import binp.nbi.tango.util.Constants;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
