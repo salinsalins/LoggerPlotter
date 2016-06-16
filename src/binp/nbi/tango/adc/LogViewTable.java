@@ -183,7 +183,6 @@ public class LogViewTable extends JTable {
         setModel(model);
 
         // Add first column "Time"
-        //model.addColumn("Time");
         addColumn("Time");
 
         // Add columns from includedSignalNames
@@ -210,14 +209,17 @@ public class LogViewTable extends JTable {
 
                 // First field is the Date/Time of Shot in YYYY-MM-DD HH:mm:SS
                 // format
-                if (fields.length > 0) {
+                if (fields.length > 1) {
                     // Add row to the model
                     model.addRow(new String[0]);
+                    files.add(null);
+                    shots.add(null);
 
-                    // Split HH:mm:SS from Time and add space in front for
+                    // Split HH:mm:SS from Date/Time and add space in front for
                     // better look
-                    String cell = " " + fields[0].split(" ")[1];
-                    addColumn("Time", cell);
+                    nv = fields[0].split(" ");
+                    if (nv.length < 2) continue;
+                    addColumn("Time", " " + nv[1].trim());
 
                     // Iterate for other fields in the line
                     for (int i = 1; i < fields.length; i++) {
@@ -230,36 +232,35 @@ public class LogViewTable extends JTable {
                         } else {
                             continue;
                         }
+                        if (2 != nv.length) continue;
+                        
                         nv[0] = nv[0].trim();
                         nv[1] = nv[1].trim();
                         // System.out.println(nv[0] + " -- " + nv[1]);
-                        if (nv.length > 1) {
-                            if (nv[0].equals("File")) {
-                                // log.trace(marks[i]);
-                                String zipFileName = new File(nv[1]).getName();
-                                File zipFile = new File(dir, zipFileName);
-                                if (zipFile.exists()) {
-                                    // log.trace("Add zip file to list " +
-                                    // zipFileName);
-                                    files.add(zipFile);
-                                } else {
-                                    files.add(null);
-                                }
-                            }
 
-                            if (nv[0].equals("Shot")) {
-                                if (shots.contains(nv[1]) && excludeDuplicatedShots) {
-                                    continue;
-                                }
+                        if (nv[0].equals("File")) {
+                            // log.trace(marks[i]);
+                            String zipFileName = new File(nv[1]).getName();
+                            File zipFile = new File(dir, zipFileName);
+                            if (zipFile.exists()) {
+                                // log.trace("Add zip file to list " +
+                                // zipFileName);
+                                files.set(files.size()-1, zipFile);
                             }
-                            shots.add(nv[1]);
+                        }
 
-                            if (StringArray.contains(excludedSignalNames, nv[0])) {
+                        if (nv[0].equals("Shot")) {
+                            if (shots.contains(nv[1]) && excludeDuplicatedShots) {
                                 continue;
                             }
-
-                            addColumn(nv[0], nv[1]);
+                            shots.set(shots.size()-1, nv[1]);
                         }
+
+                        if (StringArray.contains(excludedSignalNames, nv[0])) {
+                            continue;
+                        }
+
+                        addColumn(nv[0], nv[1]);
                     }
                 }
             }
@@ -295,8 +296,8 @@ public class LogViewTable extends JTable {
     public void scrollToLastRow() {
         int lastRow = getRowCount() - 1;
         if (lastRow >= 0) {
-            setRowSelectionInterval(lastRow, lastRow);
             scrollTo(lastRow, 0);
+            setRowSelectionInterval(lastRow, lastRow);
         }
     }
 
