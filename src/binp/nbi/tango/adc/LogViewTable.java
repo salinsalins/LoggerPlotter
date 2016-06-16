@@ -21,15 +21,16 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-//import java.util.logging.LogManager;
-//import java.util.logging.Logger;
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class LogViewTable extends JTable {
 
     private static final long serialVersionUID = 8656104666552673873L;
-    private static final Logger log = LogManager.getLogger(LogViewTable.class.getName());
+    //private static final Logger logger = LogManager.getLogger(LogViewTable.class.getName());
+    private static final Logger logger = Logger.getLogger(LogViewTable.class.getName());
 
     private String[] includedSignalNames = {"Time", "Shot", "U_ex", "I_ex",
         "U_tot", "I_ac"};
@@ -266,9 +267,9 @@ public class LogViewTable extends JTable {
             bReader.close();
             scrollToLastRow();
         } catch (FileNotFoundException e) {
-            log.trace("File " + logFile.getAbsolutePath() + " not found");
+            logger.log(Level.INFO, "File {0} not found", logFile.getAbsolutePath());
         } catch (IOException e) {
-            log.trace(e);
+            logger.log(Level.INFO, "IOException ", e);
         }
     }
 
