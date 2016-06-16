@@ -1,6 +1,7 @@
 package binp.nbi.tango.adc;
 
 import binp.nbi.tango.util.Constants;
+import binp.nbi.tango.util.StringArray;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
@@ -24,372 +25,381 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class LogViewTable extends JTable {
-	private static final long serialVersionUID = 8656104666552673873L;
-	private static final Logger log = LogManager.getLogger(LoggerPlotter.class);
 
-	private String[] includedSignalNames = { "Time", "Shot", "U_ex", "I_ex",
-			"U_tot", "I_ac" };
-	private String[] excludedSignalNames = { "File", "RF_PHASE", "S_C1(A)" };
-	boolean excludeDuplicatedShots = false;
-	boolean refreshOnShow = false;
+    private static final long serialVersionUID = 8656104666552673873L;
+    private static final Logger log = LogManager.getLogger(LoggerPlotter.class);
 
-	File logFile;
-	LinkedList<File> files;
-	LinkedList<String> shots;
-	LinkedList<String> columns;
+    private String[] includedSignalNames = {"Time", "Shot", "U_ex", "I_ex",
+        "U_tot", "I_ac"};
+    private String[] excludedSignalNames = {"File", "RF_PHASE", "S_C1(A)"};
+    boolean excludeDuplicatedShots = false;
+    boolean refreshOnShow = false;
 
-	public LogViewTable() {
-		super();
-		setPreferredScrollableViewportSize(new Dimension(500, 70));
-		setFillsViewportHeight(true);
-		setFont(new Font("SansSerif", Font.PLAIN, 16));
-		setRowHeight(25);
-		getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 16));
-		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	}
+    File logFile;
+    LinkedList<File> files;
+    LinkedList<String> shots;
+    LinkedList<String> columns;
 
-	public LogViewTable(String fileName) {
-		this();
-		readFile(fileName);
-	}
+    public LogViewTable() {
+        super();
+        setPreferredScrollableViewportSize(new Dimension(500, 70));
+        setFillsViewportHeight(true);
+        setFont(new Font("SansSerif", Font.PLAIN, 16));
+        setRowHeight(25);
+        getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 16));
+        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    }
 
-	public LogViewTable(File file) {
-		this();
-		readFile(file);
-	}
+    public LogViewTable(String fileName) {
+        this();
+        readFile(fileName);
+    }
 
-	/**
-	 * @return the includedSignalNames
-	 */
-	public String[] getIncludedSignalNames() {
-		return includedSignalNames;
-	}
+    public LogViewTable(File file) {
+        this();
+        readFile(file);
+    }
 
-	/**
-	 * @param includedSignalNames
-	 *            the includedSignalNames to set
-	 */
-	public void setIncludedSignalNames(String[] includedSignalNames) {
-		this.includedSignalNames = includedSignalNames;
-	}
+    /**
+     * @return the includedSignalNames
+     */
+    public String[] getIncludedSignalNames() {
+        return includedSignalNames;
+    }
 
-	public void setIncludedSignalNames(String includedSignalNames) {
-		String[] stringArray = includedSignalNames.split("\n");
-		// System.out.println("Included " + stringArray.length);
-		setIncludedSignalNames(stringArray);
-	}
+    /**
+     * @param includedSignalNames the includedSignalNames to set
+     */
+    public void setIncludedSignalNames(String[] includedSignalNames) {
+        this.includedSignalNames = includedSignalNames;
+    }
 
-	/**
-	 * @return the excludedSignalNames
-	 */
-	public String[] getExcludedSignalNames() {
-		return excludedSignalNames;
-	}
+    public void setIncludedSignalNames(String includedSignalNames) {
+        String[] stringArray = includedSignalNames.split("\n");
+        // System.out.println("Included " + stringArray.length);
+        setIncludedSignalNames(stringArray);
+    }
 
-	/**
-	 * @param excludedSignalNames
-	 *            the excludedSignalNames to set
-	 */
-	public void setExcludedSignalNames(String[] excludedSignalNames) {
-		this.excludedSignalNames = excludedSignalNames;
-	}
+    /**
+     * @return the excludedSignalNames
+     */
+    public String[] getExcludedSignalNames() {
+        return excludedSignalNames;
+    }
 
-	public void setExcludedSignalNames(String excludedSignalNames) {
-		String[] stringArray = excludedSignalNames.split("\n");
-		// System.out.println("Excluded " + stringArray.length);
-		setExcludedSignalNames(stringArray);
-	}
+    /**
+     * @param excludedSignalNames the excludedSignalNames to set
+     */
+    public void setExcludedSignalNames(String[] excludedSignalNames) {
+        this.excludedSignalNames = excludedSignalNames;
+    }
 
-	/**
-	 * @return the excludeDuplicatedShots
-	 */
-	public boolean isExcludeDuplicatedShots() {
-		return excludeDuplicatedShots;
-	}
+    public void setExcludedSignalNames(String excludedSignalNames) {
+        String[] stringArray = excludedSignalNames.split("\n");
+        // System.out.println("Excluded " + stringArray.length);
+        setExcludedSignalNames(stringArray);
+    }
 
-	/**
-	 * @param excludeDuplicatedShots
-	 *            the excludeDuplicatedShots to set
-	 */
-	public void setExcludeDuplicatedShots(boolean excludeDuplicatedShots) {
-		this.excludeDuplicatedShots = excludeDuplicatedShots;
-	}
+    /**
+     * @return the excludeDuplicatedShots
+     */
+    public boolean isExcludeDuplicatedShots() {
+        return excludeDuplicatedShots;
+    }
 
-	public boolean addColumn(String columnName) {
-		columnName = columnName.trim();
-		if (columnName == null || "".equals(columnName))
-			return false;
-		DefaultTableModel model = (DefaultTableModel) getModel();
-		int i = model.findColumn(columnName);
-		if (i < 0) {
-			model.addColumn(columnName);
-			// System.out.println("Added column " + columnName);
-			columns.add(columnName);
-			return true;
-		}
-		// System.out.println("Column exists " + columnName + " " + i);
-		return false;
-	}
+    /**
+     * @param excludeDuplicatedShots the excludeDuplicatedShots to set
+     */
+    public void setExcludeDuplicatedShots(boolean excludeDuplicatedShots) {
+        this.excludeDuplicatedShots = excludeDuplicatedShots;
+    }
 
-	public void addColumn(String columnName, String cellValue) {
-		columnName = columnName.trim();
-		if (columnName == null || "".equals(columnName))
-			return;
-		DefaultTableModel model = (DefaultTableModel) getModel();
-		int row = model.getRowCount() - 1;
-		if (row < 0) {
-			model.addRow(new String[0]);
-			row = model.getRowCount() - 1;
-		}
-		int col = model.findColumn(columnName);
-		if (col < 0) {
-			model.addColumn(columnName);
-			columns.add(columnName);
-			col = model.findColumn(columnName);
-		}
-		setValueAt(cellValue.trim(), row, col);
-	}
+    public boolean addColumn(String columnName) {
+        columnName = columnName.trim();
+        if (columnName == null || "".equals(columnName)) {
+            return false;
+        }
+        DefaultTableModel model = (DefaultTableModel) getModel();
+        int i = model.findColumn(columnName);
+        if (i < 0) {
+            model.addColumn(columnName);
+            // System.out.println("Added column " + columnName);
+            columns.add(columnName);
+            return true;
+        }
+        // System.out.println("Column exists " + columnName + " " + i);
+        return false;
+    }
 
-	public void readFile(String fileName) {
-		readFile(new File(fileName));
-	}
+    public void addColumn(String columnName, String cellValue) {
+        columnName = columnName.trim();
+        if (columnName == null || "".equals(columnName)) {
+            return;
+        }
+        DefaultTableModel model = (DefaultTableModel) getModel();
+        int row = model.getRowCount() - 1;
+        if (row < 0) {
+            model.addRow(new String[0]);
+            row = model.getRowCount() - 1;
+        }
+        int col = model.findColumn(columnName);
+        if (col < 0) {
+            model.addColumn(columnName);
+            columns.add(columnName);
+            col = model.findColumn(columnName);
+        }
+        setValueAt(cellValue.trim(), row, col);
+    }
 
-	public void readFile(File file) {
-		if (!file.canRead())
-			return;
-		logFile = file;
-		readFile();
-	}
+    public void readFile(String fileName) {
+        readFile(new File(fileName));
+    }
 
-	public void readFile() {
-		if (!isShowing()) {
-			// log.trace("Table is Hidden");
-			refreshOnShow = true;
-			return;
-		}
+    public void readFile(File file) {
+        if (!file.canRead()) {
+            return;
+        }
+        logFile = file;
+        readFile();
+    }
 
-		refreshOnShow = false;
-		File dir = logFile.getParentFile();
-		files = new LinkedList<File>();
-		shots = new LinkedList<String>();
-		columns = new LinkedList<String>();
+    public void readFile() {
+        if (!isShowing()) {
+            // log.trace("Table is Hidden");
+            refreshOnShow = true;
+            return;
+        }
 
-		// Set new empty model
-		DefaultTableModel model = new DefaultTableModel();
-		setModel(model);
+        refreshOnShow = false;
+        File dir = logFile.getParentFile();
+        files = new LinkedList<File>();
+        shots = new LinkedList<String>();
+        columns = new LinkedList<String>();
 
-		// Add first column "Time"
-		//model.addColumn("Time");
-		addColumn("Time");
+        // Set new empty model
+        DefaultTableModel model = new DefaultTableModel();
+        setModel(model);
 
-		// Add columns from includedSignalNames
-		for (String str : includedSignalNames) {
-			addColumn(str);
-		}
+        // Add first column "Time"
+        //model.addColumn("Time");
+        addColumn("Time");
 
-		try {
-			// Open log file
-			FileReader fr = new FileReader(logFile);
-			BufferedReader bReader = new BufferedReader(fr);
+        // Add columns from includedSignalNames
+        for (String str : includedSignalNames) {
+            addColumn(str);
+        }
 
-			String line;
-			String[] fields;
-			String[] nv;
+        try {
+            // Open log file
+            FileReader fr = new FileReader(logFile);
+            BufferedReader bReader = new BufferedReader(fr);
 
-			// Read log file line by line
-			while ((line = bReader.readLine()) != null) {
-				// System.out.println(line);
+            String line;
+            String[] fields;
+            String[] nv;
 
-				// Split line to fields separated by Constants.LOG_DELIMETER
-				// ("; " by default)
-				fields = line.split(Constants.LOG_DELIMETER);
+            // Read log file line by line
+            while ((line = bReader.readLine()) != null) {
+                // System.out.println(line);
 
-				// First field is the Date/Time of Shot in YYYY-MM-DD HH:mm:SS
-				// format
-				if (fields.length > 0) {
-					// Add row to the model
-					model.addRow(new String[0]);
+                // Split line to fields separated by Constants.LOG_DELIMETER
+                // ("; " by default)
+                fields = line.split(Constants.LOG_DELIMETER);
 
-					// Split HH:mm:SS from Time and add space in front for
-					// better look
-					String cell = " " + fields[0].split(" ")[1];
-					addColumn("Time", cell);
+                // First field is the Date/Time of Shot in YYYY-MM-DD HH:mm:SS
+                // format
+                if (fields.length > 0) {
+                    // Add row to the model
+                    model.addRow(new String[0]);
 
-					// Iterate for other fields in the line
-					for (int i = 1; i < fields.length; i++) {
-						// Split each field for as "name = value" pair in the
-						// nv[2]
-						if (fields[i].contains(Constants.PROP_VAL_DELIMETER)) {
-							nv = fields[i].split(Constants.PROP_VAL_DELIMETER);
-						} else {
-							if (fields[i].contains(Constants.PROP_VAL_DELIMETER_OLD)) {
-								nv = fields[i].split(Constants.PROP_VAL_DELIMETER_OLD);
-							} else
-								continue;
-						}
-						nv[0] = nv[0].trim();
-						nv[1] = nv[1].trim();
-						// System.out.println(nv[0] + " -- " + nv[1]);
-						if (nv.length > 1) {
-							if (nv[0].equals("File")) {
-								// log.trace(marks[i]);
-								String zipFileName = new File(nv[1]).getName();
-								File zipFile = new File(dir, zipFileName);
-								if (zipFile.exists()) {
-									// log.trace("Add zip file to list " +
-									// zipFileName);
-									files.add(zipFile);
-								} else {
-									files.add(null);
-								}
-							}
+                    // Split HH:mm:SS from Time and add space in front for
+                    // better look
+                    String cell = " " + fields[0].split(" ")[1];
+                    addColumn("Time", cell);
 
-							if (nv[0].equals("Shot")) {
-								if (shots.contains(nv[1]) && excludeDuplicatedShots)
-									continue;
-							}
-							shots.add(nv[1]);
+                    // Iterate for other fields in the line
+                    for (int i = 1; i < fields.length; i++) {
+                        // Split each field for as "name = value" pair in the
+                        // nv[2]
+                        if (fields[i].contains(Constants.PROP_VAL_DELIMETER)) {
+                            nv = fields[i].split(Constants.PROP_VAL_DELIMETER);
+                        } else if (fields[i].contains(Constants.PROP_VAL_DELIMETER_OLD)) {
+                            nv = fields[i].split(Constants.PROP_VAL_DELIMETER_OLD);
+                        } else {
+                            continue;
+                        }
+                        nv[0] = nv[0].trim();
+                        nv[1] = nv[1].trim();
+                        // System.out.println(nv[0] + " -- " + nv[1]);
+                        if (nv.length > 1) {
+                            if (nv[0].equals("File")) {
+                                // log.trace(marks[i]);
+                                String zipFileName = new File(nv[1]).getName();
+                                File zipFile = new File(dir, zipFileName);
+                                if (zipFile.exists()) {
+                                    // log.trace("Add zip file to list " +
+                                    // zipFileName);
+                                    files.add(zipFile);
+                                } else {
+                                    files.add(null);
+                                }
+                            }
 
-							if (StringArray.contains(excludedSignalNames, nv[0]))
-								continue;
+                            if (nv[0].equals("Shot")) {
+                                if (shots.contains(nv[1]) && excludeDuplicatedShots) {
+                                    continue;
+                                }
+                            }
+                            shots.add(nv[1]);
 
-							addColumn(nv[0], nv[1]);
-						}
-					}
-				}
-			}
-			bReader.close();
-			scrollToLastRow();
-		} catch (FileNotFoundException e) {
-			log.trace("File " + logFile.getAbsolutePath() + " not found");
-		} catch (IOException e) {
-			log.trace(e);
-		}
-	}
+                            if (StringArray.contains(excludedSignalNames, nv[0])) {
+                                continue;
+                            }
 
-	public void scrollTo(int rowIndex, int colIndex) {
-		// System.out.printf("Scroll To : %d %d\n", rowIndex, colIndex);
-		if (!(getParent() instanceof JViewport)) {
-			return;
-		}
-		JViewport viewport = (JViewport) getParent();
-		Rectangle rect = getCellRect(rowIndex, colIndex, true);
-		// System.out.println("rect = " + rect);
-		Point pt = viewport.getViewPosition();
-		// System.out.println("pt = " + pt);
-		// int vh = viewport.getHeight();
-		// System.out.println("vh = " + vh);
-		rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-		// System.out.println("rect = " + rect);
-		// viewport.scrollRectToVisible(new Rectangle(0, 0, rect.width,
-		// rect.height));
-		viewport.scrollRectToVisible(rect);
-		repaint();
-	}
+                            addColumn(nv[0], nv[1]);
+                        }
+                    }
+                }
+            }
+            bReader.close();
+            scrollToLastRow();
+        } catch (FileNotFoundException e) {
+            log.trace("File " + logFile.getAbsolutePath() + " not found");
+        } catch (IOException e) {
+            log.trace(e);
+        }
+    }
 
-	public void scrollToLastRow() {
-		int lastRow = getRowCount() - 1;
-		if (lastRow >= 0) {
-			setRowSelectionInterval(lastRow, lastRow);
-			scrollTo(lastRow, 0);
-		}
-	}
+    public void scrollTo(int rowIndex, int colIndex) {
+        // System.out.printf("Scroll To : %d %d\n", rowIndex, colIndex);
+        if (!(getParent() instanceof JViewport)) {
+            return;
+        }
+        JViewport viewport = (JViewport) getParent();
+        Rectangle rect = getCellRect(rowIndex, colIndex, true);
+        // System.out.println("rect = " + rect);
+        Point pt = viewport.getViewPosition();
+        // System.out.println("pt = " + pt);
+        // int vh = viewport.getHeight();
+        // System.out.println("vh = " + vh);
+        rect.setLocation(rect.x - pt.x, rect.y - pt.y);
+        // System.out.println("rect = " + rect);
+        // viewport.scrollRectToVisible(new Rectangle(0, 0, rect.width,
+        // rect.height));
+        viewport.scrollRectToVisible(rect);
+        repaint();
+    }
 
-	public void scrollToValue(String str) {
-		int[] rc = find(str);
-		if (rc[0] >= 0)
-			scrollTo(rc[0], rc[1]);
-	}
+    public void scrollToLastRow() {
+        int lastRow = getRowCount() - 1;
+        if (lastRow >= 0) {
+            setRowSelectionInterval(lastRow, lastRow);
+            scrollTo(lastRow, 0);
+        }
+    }
 
-	public int[] find(String str) {
-		int[] result = { -1, -1 };
-		int rows = getRowCount();
-		int cols = getColumnCount();
-		TableModel model = getModel();
-		if (rows <= 0 || cols <= 0)
-			return result;
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				if (model.getValueAt(i, j).equals(str)) {
-					result[0] = i;
-					result[1] = j;
-					return result;
-				}
-			}
-		}
-		return result;
-	}
+    public void scrollToValue(String str) {
+        int[] rc = find(str);
+        if (rc[0] >= 0) {
+            scrollTo(rc[0], rc[1]);
+        }
+    }
 
-	public int[] findLast(String str) {
-		int[] result = { -1, -1 };
-		int rows = getRowCount();
-		int cols = getColumnCount();
-		if (rows <= 0 || cols <= 0)
-			return result;
-		TableModel model = getModel();
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				if (model.getValueAt(i, j).equals(str)) {
-					result[0] = i;
-					result[1] = j;
-				}
-			}
-		}
-		return result;
-	}
+    public int[] find(String str) {
+        int[] result = {-1, -1};
+        int rows = getRowCount();
+        int cols = getColumnCount();
+        TableModel model = getModel();
+        if (rows <= 0 || cols <= 0) {
+            return result;
+        }
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (model.getValueAt(i, j).equals(str)) {
+                    result[0] = i;
+                    result[1] = j;
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
 
-	public List<int[]> findAll(String str) {
-		LinkedList<int[]> result = new LinkedList<int[]>();
-		int rows = getRowCount();
-		int cols = getColumnCount();
-		if (rows <= 0 || cols <= 0)
-			return result;
-		TableModel model = getModel();
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				if (model.getValueAt(i, j).equals(str)) {
-					int[] t = { i, j };
-					result.add(t);
-				}
-			}
-		}
-		return result;
-	}
+    public int[] findLast(String str) {
+        int[] result = {-1, -1};
+        int rows = getRowCount();
+        int cols = getColumnCount();
+        if (rows <= 0 || cols <= 0) {
+            return result;
+        }
+        TableModel model = getModel();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (model.getValueAt(i, j).equals(str)) {
+                    result[0] = i;
+                    result[1] = j;
+                }
+            }
+        }
+        return result;
+    }
 
-	public int findColumn(String str) {
-		return ((AbstractTableModel) getModel()).findColumn(str);
-	}
+    public List<int[]> findAll(String str) {
+        LinkedList<int[]> result = new LinkedList<int[]>();
+        int rows = getRowCount();
+        int cols = getColumnCount();
+        if (rows <= 0 || cols <= 0) {
+            return result;
+        }
+        TableModel model = getModel();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (model.getValueAt(i, j).equals(str)) {
+                    int[] t = {i, j};
+                    result.add(t);
+                }
+            }
+        }
+        return result;
+    }
 
-	public int findInColumn(String col, String str) {
-		int colN = findColumn(col);
-		if (colN < 0)
-			return -1;
-		return findInColumn(colN, str);
-	}
+    public int findColumn(String str) {
+        return ((AbstractTableModel) getModel()).findColumn(str);
+    }
 
-	public int findInColumn(int coli, String str) {
-		if (coli < 0)
-			return -1;
-		int rows = getRowCount();
-		if (rows <= 0)
-			return -1;
-		TableModel model = getModel();
-		for (int i = 0; i < rows; i++) {
-			if (model.getValueAt(i, coli).equals(str)) {
-				return i;
-			}
-		}
-		return -1;
-	}
+    public int findInColumn(String col, String str) {
+        int colN = findColumn(col);
+        if (colN < 0) {
+            return -1;
+        }
+        return findInColumn(colN, str);
+    }
 
-	public static void scrollTableTo(JTable table, int rowIndex, int colIndex) {
-		if (!(table.getParent() instanceof JViewport)) {
-			return;
-		}
-		JViewport viewport = (JViewport) table.getParent();
-		Rectangle rect = table.getCellRect(rowIndex, colIndex, true);
-		Point pt = viewport.getViewPosition();
-		rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-		viewport.scrollRectToVisible(rect);
-	}
+    public int findInColumn(int coli, String str) {
+        if (coli < 0) {
+            return -1;
+        }
+        int rows = getRowCount();
+        if (rows <= 0) {
+            return -1;
+        }
+        TableModel model = getModel();
+        for (int i = 0; i < rows; i++) {
+            if (model.getValueAt(i, coli).equals(str)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void scrollTableTo(JTable table, int rowIndex, int colIndex) {
+        if (!(table.getParent() instanceof JViewport)) {
+            return;
+        }
+        JViewport viewport = (JViewport) table.getParent();
+        Rectangle rect = table.getCellRect(rowIndex, colIndex, true);
+        Point pt = viewport.getViewPosition();
+        rect.setLocation(rect.x - pt.x, rect.y - pt.y);
+        viewport.scrollRectToVisible(rect);
+    }
 }
