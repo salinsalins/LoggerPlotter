@@ -23,11 +23,13 @@ import javax.swing.table.TableModel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+//import java.util.logging.LogManager;
+//import java.util.logging.Logger;
 
 public class LogViewTable extends JTable {
 
     private static final long serialVersionUID = 8656104666552673873L;
-    private static final Logger log = LogManager.getLogger(LoggerPlotter.class);
+    private static final Logger log = LogManager.getLogger(LogViewTable.class);
 
     private String[] includedSignalNames = {"Time", "Shot", "U_ex", "I_ex",
         "U_tot", "I_ac"};
@@ -151,11 +153,11 @@ public class LogViewTable extends JTable {
         setValueAt(cellValue.trim(), row, col);
     }
 
-    public void readFile(String fileName) {
+    public final void readFile(String fileName) {
         readFile(new File(fileName));
     }
 
-    public void readFile(File file) {
+    public final void readFile(File file) {
         if (!file.canRead()) {
             return;
         }
@@ -172,9 +174,9 @@ public class LogViewTable extends JTable {
 
         refreshOnShow = false;
         File dir = logFile.getParentFile();
-        files = new LinkedList<File>();
-        shots = new LinkedList<String>();
-        columns = new LinkedList<String>();
+        files = new LinkedList<>();
+        shots = new LinkedList<>();
+        columns = new LinkedList<>();
 
         // Set new empty model
         DefaultTableModel model = new DefaultTableModel();
