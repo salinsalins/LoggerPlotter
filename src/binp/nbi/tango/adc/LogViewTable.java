@@ -173,7 +173,6 @@ public class LogViewTable extends JTable {
         }
 
         refreshOnShow = false;
-        File dir = logFile.getParentFile();
         files = new LinkedList<>();
         shots = new LinkedList<>();
         columns = new LinkedList<>();
@@ -241,7 +240,7 @@ public class LogViewTable extends JTable {
                         if (nv[0].equals("File")) {
                             // log.trace(marks[i]);
                             String zipFileName = new File(nv[1]).getName();
-                            File zipFile = new File(dir, zipFileName);
+                            File zipFile = new File(logFile.getParentFile(), zipFileName);
                             if (zipFile.exists()) {
                                 // log.trace("Add zip file to list " +
                                 // zipFileName);
