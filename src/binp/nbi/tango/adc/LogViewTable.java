@@ -23,11 +23,13 @@ import javax.swing.table.TableModel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+//import java.util.logging.LogManager;
+//import java.util.logging.Logger;
 
 public class LogViewTable extends JTable {
 
     private static final long serialVersionUID = 8656104666552673873L;
-    private static final Logger log = LogManager.getLogger(LoggerPlotter.class);
+    private static final Logger log = LogManager.getLogger(LogViewTable.class.getName());
 
     private String[] includedSignalNames = {"Time", "Shot", "U_ex", "I_ex",
         "U_tot", "I_ac"};
