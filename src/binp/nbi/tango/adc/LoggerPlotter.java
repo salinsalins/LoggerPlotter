@@ -645,7 +645,7 @@ class DirWatcher extends TimerTask {
         this.folder = lp.folder;
         File dir = new File(folder);
         //oldDirList = dir.list();
-        oldDirList = new LinkedList<String>(Arrays.asList(dir.list()));
+        oldDirList = new LinkedList<>(Arrays.asList(dir.list()));
         //oldnFiles = oldDirList.length;
         oldnFiles = oldDirList.size();
         count = 0;
