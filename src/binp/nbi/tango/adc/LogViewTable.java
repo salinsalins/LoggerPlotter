@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,8 +37,12 @@ public class LogViewTable extends JTable {
     private String[] includedSignalNames = {"Time", "Shot", "U_ex", "I_ex",
         "U_tot", "I_ac"};
     private String[] excludedSignalNames = {"File", "RF_PHASE", "S_C1(A)"};
-    boolean excludeDuplicatedShots = false;
+    boolean excludeDuplicateShots = false;
     boolean refreshOnShow = false;
+
+    private List<String> included = new ArrayList<>();//Arrays.asList(); //{"Time", "Shot", "U_ex", "I_ex", "U_tot", "I_ac"});
+    private List<String> excluded = new ArrayList<>();// = {"File", "RF_PHASE", "S_C1(A)"};
+
 
     File logFile;
     LinkedList<File> files;
@@ -107,14 +113,14 @@ public class LogViewTable extends JTable {
      * @return the excludeDuplicatedShots
      */
     public boolean isExcludeDuplicatedShots() {
-        return excludeDuplicatedShots;
+        return excludeDuplicateShots;
     }
 
     /**
      * @param excludeDuplicatedShots the excludeDuplicatedShots to set
      */
     public void setExcludeDuplicatedShots(boolean excludeDuplicatedShots) {
-        this.excludeDuplicatedShots = excludeDuplicatedShots;
+        this.excludeDuplicateShots = excludeDuplicatedShots;
     }
 
     public boolean addColumn(String columnName) {
@@ -250,7 +256,7 @@ public class LogViewTable extends JTable {
                         }
 
                         if (nv[0].equals("Shot")) {
-                            if (shots.contains(nv[1]) && excludeDuplicatedShots) {
+                            if (shots.contains(nv[1]) && excludeDuplicateShots) {
                                 continue;
                             }
                             shots.set(shots.size()-1, nv[1]);
@@ -273,24 +279,27 @@ public class LogViewTable extends JTable {
         }
     }
 
-    public void scrollTo(int rowIndex, int colIndex) {
-        // System.out.printf("Scroll To : %d %d\n", rowIndex, colIndex);
-        if (!(getParent() instanceof JViewport)) {
+    public void scrollTo(int row, int col) {
+       if (!(getParent() instanceof JViewport)) {
             return;
         }
         JViewport viewport = (JViewport) getParent();
-        Rectangle rect = getCellRect(rowIndex, colIndex, true);
-        // System.out.println("rect = " + rect);
+        Rectangle rect = getCellRect(row, col, true);
         Point pt = viewport.getViewPosition();
-        // System.out.println("pt = " + pt);
-        // int vh = viewport.getHeight();
-        // System.out.println("vh = " + vh);
         rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-        // System.out.println("rect = " + rect);
-        // viewport.scrollRectToVisible(new Rectangle(0, 0, rect.width,
-        // rect.height));
         viewport.scrollRectToVisible(rect);
         repaint();
+    }
+
+    public void scrollTo(int row) {
+        scrollTo(row, 0);
+    }
+    
+    public void scrollTo() {
+        int lastRow = getRowCount() - 1;
+        if (lastRow >= 0) {
+            scrollTo(lastRow, 0);
+        }
     }
 
     public void scrollToLastRow() {
@@ -303,7 +312,7 @@ public class LogViewTable extends JTable {
 
     public void scrollToValue(String str) {
         int[] rc = find(str);
-        if (rc[0] >= 0) {
+        if (rc[0] >= 0 && rc[1] >= 0) {
             scrollTo(rc[0], rc[1]);
         }
     }
@@ -312,13 +321,13 @@ public class LogViewTable extends JTable {
         int[] result = {-1, -1};
         int rows = getRowCount();
         int cols = getColumnCount();
-        TableModel model = getModel();
         if (rows <= 0 || cols <= 0) {
             return result;
         }
+        TableModel model = getModel();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                if (model.getValueAt(i, j).equals(str)) {
+                if (str.equals(model.getValueAt(i, j).toString())) {
                     result[0] = i;
                     result[1] = j;
                     return result;
@@ -348,7 +357,7 @@ public class LogViewTable extends JTable {
     }
 
     public List<int[]> findAll(String str) {
-        LinkedList<int[]> result = new LinkedList<int[]>();
+        LinkedList<int[]> result = new LinkedList<>();
         int rows = getRowCount();
         int cols = getColumnCount();
         if (rows <= 0 || cols <= 0) {
@@ -371,15 +380,15 @@ public class LogViewTable extends JTable {
     }
 
     public int findInColumn(String col, String str) {
-        int colN = findColumn(col);
-        if (colN < 0) {
+        int column = findColumn(col);
+        if (column < 0) {
             return -1;
         }
-        return findInColumn(colN, str);
+        return findInColumn(column, str);
     }
 
-    public int findInColumn(int coli, String str) {
-        if (coli < 0) {
+    public int findInColumn(int col, String str) {
+        if (col < 0) {
             return -1;
         }
         int rows = getRowCount();
@@ -388,7 +397,7 @@ public class LogViewTable extends JTable {
         }
         TableModel model = getModel();
         for (int i = 0; i < rows; i++) {
-            if (model.getValueAt(i, coli).equals(str)) {
+            if (model.getValueAt(i, col).equals(str)) {
                 return i;
             }
         }
