@@ -146,6 +146,14 @@ public class LoggerPlotter extends WindowAdapter {
 
         logViewTable = new LogViewTable();
         scrollPane.setViewportView(logViewTable);
+        logViewTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                //System.out.println(arg0.getButton());
+                if(arg0.getButton() != MouseEvent.BUTTON3) return;
+                logViewTable.saveAsCSV();
+            }
+        });
 
         JScrollPane scrollPane_1 = new JScrollPane();
         splitPane.setLeftComponent(scrollPane_1);

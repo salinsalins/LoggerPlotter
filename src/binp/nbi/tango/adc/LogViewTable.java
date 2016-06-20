@@ -23,15 +23,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import javax.swing.event.TableColumnModelEvent;
 
 public class LogViewTable extends JTable {
 
     private static final long serialVersionUID = 8656104666552673873L;
-    //private static final Logger logger = LogManager.getLogger(LogViewTable.class.getName());
     private static final Logger logger = Logger.getLogger(LogViewTable.class.getName());
 
     private String[] includedSignalNames = {"Time", "Shot", "U_ex", "I_ex",
@@ -40,9 +38,8 @@ public class LogViewTable extends JTable {
     boolean excludeDuplicateShots = false;
     boolean refreshOnShow = false;
 
-    private List<String> included = new ArrayList<>();//Arrays.asList(); //{"Time", "Shot", "U_ex", "I_ex", "U_tot", "I_ac"});
-    private List<String> excluded = new ArrayList<>();// = {"File", "RF_PHASE", "S_C1(A)"};
-
+    private List<String> included;
+    private List<String> excluded;
 
     File logFile;
     LinkedList<File> files;
@@ -51,6 +48,12 @@ public class LogViewTable extends JTable {
 
     public LogViewTable() {
         super();
+
+        this.included = new LinkedList<>();
+        this.included.addAll(Arrays.asList("Time", "Shot", "U_ex", "I_ex", "U_tot", "I_ac"));
+        this.excluded = new LinkedList<>();
+        this.excluded.addAll(Arrays.asList("File", "RF_PHASE", "S_C1(A)"));
+
         setPreferredScrollableViewportSize(new Dimension(500, 70));
         setFillsViewportHeight(true);
         setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -87,6 +90,12 @@ public class LogViewTable extends JTable {
         String[] stringArray = includedSignalNames.split("\n");
         // System.out.println("Included " + stringArray.length);
         setIncludedSignalNames(stringArray);
+    }
+
+    public void setIncluded(String str) {
+        String[] strarr = str.split("\n");
+        included = new ArrayList<>();
+        included.addAll(Arrays.asList(strarr));
     }
 
     /**
@@ -413,5 +422,59 @@ public class LogViewTable extends JTable {
         Point pt = viewport.getViewPosition();
         rect.setLocation(rect.x - pt.x, rect.y - pt.y);
         viewport.scrollRectToVisible(rect);
+    }
+
+    //@Override
+    //public void columnMoved(TableColumnModelEvent e) {
+        //System.out.println("Column moved");
+        //System.out.println(e.getFromIndex());
+        //System.out.println(e.getToIndex());
+    //}
+
+    public void saveAsCSV() {
+        DefaultTableModel model = (DefaultTableModel)getModel();
+        int nc = model.getColumnCount();
+        int nr = model.getRowCount();
+        int[] cw = new int[nc];
+        String[] units = new String[nc];
+        String str;
+        String[] strarr;
+        
+        for (int j=0; j < nc; j++){
+            str = model.getColumnName(j);
+            if(cw[j] < str.length()) cw[j] = str.length(); 
+        }            
+        for (int i=0; i < nr; i++){
+            for (int j=0; j < nc; j++){
+                str = model.getValueAt(i, j).toString();
+                strarr = str.split(" ");
+                if(strarr.length > 1) units[j] = strarr[1];
+                else units[j] = "";
+                if(cw[j] < strarr[0].length()) cw[j] = strarr[0].length(); 
+            }            
+        }
+        for (int j=0; j < nc; j++){
+            str = model.getColumnName(j);
+            if(cw[j] < str.length()+units[j].length()+1) 
+                cw[j] = str.length()+units[j].length()+1; 
+        }            
+
+        for (int j=0; j < nc-1; j++){
+            System.out.printf("%"+cw[j]+"s; ", model.getColumnName(j)+" "+units[j]);
+        }            
+        System.out.printf("%"+cw[nc-1]+"s", model.getColumnName(nc-1)+" "+units[nc-1]);
+        System.out.println();
+
+        for (int i=0; i < nr; i++){
+            for (int j=0; j < nc-1; j++){
+                str = model.getValueAt(i, j).toString();
+                strarr = str.split(" ");
+                System.out.printf("%"+cw[j]+"s; ", strarr[0]);
+            }            
+            str = model.getValueAt(i, nc-1).toString();
+            strarr = str.split(" ");
+            System.out.printf("%"+cw[nc-1]+"s", strarr[0]);
+            System.out.println();
+        }
     }
 }
