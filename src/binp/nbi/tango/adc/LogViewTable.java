@@ -446,7 +446,9 @@ public class LogViewTable extends JTable {
         }            
         for (int i=0; i < nr; i++){
             for (int j=0; j < nc; j++){
-                str = model.getValueAt(i, j).toString();
+                Object o = model.getValueAt(i, j);
+                if(o != null) str = o.toString();
+                else str = "";
                 strarr = str.split(" ");
                 if(strarr.length > 1) units[j] = strarr[1];
                 else units[j] = "";
@@ -467,11 +469,15 @@ public class LogViewTable extends JTable {
 
         for (int i=0; i < nr; i++){
             for (int j=0; j < nc-1; j++){
-                str = model.getValueAt(i, j).toString();
+                Object o = model.getValueAt(i, j);
+                if(o != null) str = o.toString();
+                else str = "";
                 strarr = str.split(" ");
                 System.out.printf("%"+cw[j]+"s; ", strarr[0]);
             }            
-            str = model.getValueAt(i, nc-1).toString();
+            Object o = model.getValueAt(i, nc-1);
+            if(o != null) str = o.toString();
+            else str = "";
             strarr = str.split(" ");
             System.out.printf("%"+cw[nc-1]+"s", strarr[0]);
             System.out.println();
