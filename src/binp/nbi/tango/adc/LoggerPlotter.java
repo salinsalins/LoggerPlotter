@@ -415,6 +415,7 @@ public class LoggerPlotter extends WindowAdapter {
         String txt2 = txtarIncludedColumns.getText();
         boolean sm = chckbxShowMarkers.isSelected();
         boolean sp = chckbxShowPreviousShot.isSelected();
+        List<String> columnNames = logViewTable.getColumnNames();
         try {
             ObjectOutputStream objOStrm = new ObjectOutputStream(new FileOutputStream("config.dat"));
             objOStrm.writeObject(bounds);
@@ -424,8 +425,9 @@ public class LoggerPlotter extends WindowAdapter {
             objOStrm.writeObject(txt2);
             objOStrm.writeObject(sm);
             objOStrm.writeObject(sp);
+            objOStrm.writeObject(columnNames);
             objOStrm.close();
-            logger.fine("Config saved.");
+            logger.info("Config saved.");
         } catch (IOException e) {
             logger.log(Level.WARNING, "Config write error ", e);
         }

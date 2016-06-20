@@ -434,29 +434,34 @@ public class LogViewTable extends JTable {
 
     @Override
     public String getValueAt(int i, int j) {
-        Object o = getModel().getValueAt(i, j);
+        Object o = super.getValueAt(i, j);
         if(o != null) return o.toString();
         return "";
    }
 
+    public List<String> getColumnNames() {
+        List<String> list = new LinkedList<>();
+        for (int i=0; i < getColumnCount(); i++) {
+            list.add(getColumnName(i));
+        }
+        return list;
+   }
+
     public void saveAsCSV() {
-        DefaultTableModel model = (DefaultTableModel)getModel();
-        int nc = model.getColumnCount();
-        int nr = model.getRowCount();
+        int nc = getColumnCount();
+        int nr = getRowCount();
         int[] cw = new int[nc];
         String[] units = new String[nc];
         String str;
         String[] strarr;
         
         for (int j=0; j < nc; j++){
-            str = model.getColumnName(j);
+            str = getColumnName(j);
             if(cw[j] < str.length()) cw[j] = str.length(); 
         }            
         for (int i=0; i < nr; i++){
             for (int j=0; j < nc; j++){
-                Object o = model.getValueAt(i, j);
-                if(o != null) str = o.toString();
-                else str = "";
+                str = getValueAt(i, j);
                 strarr = str.split(" ");
                 if(strarr.length > 1) units[j] = strarr[1];
                 else units[j] = "";
@@ -464,28 +469,24 @@ public class LogViewTable extends JTable {
             }            
         }
         for (int j=0; j < nc; j++){
-            str = model.getColumnName(j);
+            str = getColumnName(j);
             if(cw[j] < str.length()+units[j].length()+1) 
                 cw[j] = str.length()+units[j].length()+1; 
         }            
 
         for (int j=0; j < nc-1; j++){
-            System.out.printf("%"+cw[j]+"s; ", model.getColumnName(j)+" "+units[j]);
+            System.out.printf("%"+cw[j]+"s; ", getColumnName(j)+" "+units[j]);
         }            
-        System.out.printf("%"+cw[nc-1]+"s", model.getColumnName(nc-1)+" "+units[nc-1]);
+        System.out.printf("%"+cw[nc-1]+"s", getColumnName(nc-1)+" "+units[nc-1]);
         System.out.println();
 
         for (int i=0; i < nr; i++){
             for (int j=0; j < nc-1; j++){
-                Object o = model.getValueAt(i, j);
-                if(o != null) str = o.toString();
-                else str = "";
+                str = getValueAt(i, j);
                 strarr = str.split(" ");
                 System.out.printf("%"+cw[j]+"s; ", strarr[0]);
             }            
-            Object o = model.getValueAt(i, nc-1);
-            if(o != null) str = o.toString();
-            else str = "";
+            str = getValueAt(i, nc-1);
             strarr = str.split(" ");
             System.out.printf("%"+cw[nc-1]+"s", strarr[0]);
             System.out.println();
