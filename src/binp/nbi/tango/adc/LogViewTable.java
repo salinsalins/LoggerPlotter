@@ -424,12 +424,20 @@ public class LogViewTable extends JTable {
         viewport.scrollRectToVisible(rect);
     }
 
-    //@Override
-    //public void columnMoved(TableColumnModelEvent e) {
-        //System.out.println("Column moved");
-        //System.out.println(e.getFromIndex());
-        //System.out.println(e.getToIndex());
-    //}
+//    @Override
+//    public void columnMoved(TableColumnModelEvent e) {
+//        System.out.println("Column moved");
+//        System.out.println(e.getFromIndex());
+//        System.out.println(e.getToIndex());
+//        super.columnMoved(e);
+//    }
+
+    @Override
+    public String getValueAt(int i, int j) {
+        Object o = getModel().getValueAt(i, j);
+        if(o != null) return o.toString();
+        return "";
+   }
 
     public void saveAsCSV() {
         DefaultTableModel model = (DefaultTableModel)getModel();
