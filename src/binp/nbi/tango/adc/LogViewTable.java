@@ -26,6 +26,8 @@ import javax.swing.table.TableModel;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import javax.swing.event.TableColumnModelEvent;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableColumnModel;
 
 public class LogViewTable extends JTable {
 
@@ -48,6 +50,7 @@ public class LogViewTable extends JTable {
 
     public LogViewTable() {
         super();
+        logger.setLevel(Level.FINE);
 
         this.included = new LinkedList<>();
         this.included.addAll(Arrays.asList("Time", "Shot", "U_ex", "I_ex", "U_tot", "I_ac"));
@@ -442,9 +445,27 @@ public class LogViewTable extends JTable {
     public List<String> getColumnNames() {
         List<String> list = new LinkedList<>();
         for (int i=0; i < getColumnCount(); i++) {
+            //System.out.printf("%d %s\n", i, getColumnName(i));
             list.add(getColumnName(i));
         }
         return list;
+   }
+
+    public void setColumnNames(List<String> columnNames) {
+        List<String> oldColumnNames = getColumnNames();
+        TableColumnModel tcm = getColumnModel();
+        TableColumnModel ntcm = new DefaultTableColumnModel();
+        for (int i=0; i < columnNames.size(); i++) {
+            String column = columnNames.get(i);
+            int index = oldColumnNames.indexOf(column);
+            if(index >= 0) {
+                ntcm.addColumn(tcm.getColumn(index));
+                //System.out.printf("Switch %s %d and %d\n", column, index, i);
+            } else {
+                addColumn(column);
+            }
+        }
+        setColumnModel(ntcm);
    }
 
     public void saveAsCSV() {

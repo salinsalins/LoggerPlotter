@@ -116,6 +116,7 @@ public class LoggerPlotter extends WindowAdapter {
      * Create the application. Default constructor.
      */
     public LoggerPlotter() {
+        logger.setLevel(Level.FINEST);
         initialize();
     }
 
@@ -335,6 +336,7 @@ public class LoggerPlotter extends WindowAdapter {
 
     private void restoreConfig() {
         String logFileName = null;
+        List<String> columnNames = new LinkedList<>();
         try {
             ObjectInputStream objIStrm = new ObjectInputStream(new FileInputStream("config.dat"));
 
@@ -359,10 +361,12 @@ public class LoggerPlotter extends WindowAdapter {
 
             boolean sp = (boolean) objIStrm.readObject();
             chckbxShowPreviousShot.setSelected(sp);
+            
+            columnNames = (List<String>) objIStrm.readObject();
 
             objIStrm.close();
 
-            logger.fine("Config restored.");
+            logger.info("Config restored.");
         } catch (IOException | ClassNotFoundException e) {
             logger.log(Level.WARNING, "Config read error {0}", e);
         }
@@ -371,6 +375,9 @@ public class LoggerPlotter extends WindowAdapter {
         timerTask = new DirWatcher(window);
         timer.schedule(timerTask, 2000, 1000);
 
+        logViewTable.readFile(logFileName);
+        logViewTable.setColumnNames(columnNames);
+        columnNames = logViewTable.getColumnNames();
         // Add event listener for logview table
         ListSelectionModel rowSM = logViewTable.getSelectionModel();
         rowSM.addListSelectionListener(new ListSelectionListener() {
@@ -401,9 +408,9 @@ public class LoggerPlotter extends WindowAdapter {
                 }
             }
         });
-
-        logViewTable.readFile(logFileName);
-    }
+        logViewTable.clearSelection();
+        logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
+   }
 
     private void saveConfig() {
         timer.cancel();
