@@ -50,14 +50,17 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.jfree.data.xy.XYSeries;
 
 public class LoggerPlotter extends WindowAdapter {
 
-    private static final Logger log = LogManager.getLogger(LoggerPlotter.class);
+    //private static final Logger logger = LogManager.getLogger(LoggerPlotter.class);
+    private static final Logger logger = Logger.getLogger(LoggerPlotter.class.getName());
 
     public static final String version = "3.0";
 
@@ -100,7 +103,7 @@ public class LoggerPlotter extends WindowAdapter {
                     //UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
                     window = new LoggerPlotter();
                     window.frame.setVisible(true);
-                    log.trace("LoggerPlotter " + version + " started.");
+                    logger.log(Level.INFO, "LoggerPlotter " + version + " started.");
                 } catch (Exception e) {
                     //log.error("LoggerPlotter start error ", e);
                     e.printStackTrace();
@@ -216,7 +219,7 @@ public class LoggerPlotter extends WindowAdapter {
                     fileLog = fileChooser.getSelectedFile();
                     folder = fileLog.getParent();
                     String logFileName = fileLog.getAbsolutePath();
-                    log.trace("Using file " + logFileName);
+                    logger.fine("Using file " + logFileName);
                     txtFileName.setText(logFileName);
                     logViewTable.readFile(logFileName);
 
@@ -351,9 +354,9 @@ public class LoggerPlotter extends WindowAdapter {
 
             objIStrm.close();
 
-            log.trace("Config restored.");
+            logger.fine("Config restored.");
         } catch (IOException | ClassNotFoundException e) {
-            log.error("Config read error ", e);
+            logger.log(Level.WARNING, "Config read error {0}", e);
         }
         timer.cancel();
         timer = new Timer();
@@ -384,7 +387,7 @@ public class LoggerPlotter extends WindowAdapter {
                             dimLineColor();
                         }
                     } catch (Exception e) {
-                        log.trace("Selection change exception ", e);
+                        logger.log(Level.WARNING, "Selection change exception ", e);
                         //panel.removeAll();
                     }
                 }
@@ -414,9 +417,9 @@ public class LoggerPlotter extends WindowAdapter {
             objOStrm.writeObject(sm);
             objOStrm.writeObject(sp);
             objOStrm.close();
-            log.trace("Config saved.");
+            logger.fine("Config saved.");
         } catch (IOException e) {
-            log.error("Config write error ", e);
+            logger.log(Level.WARNING, "Config write error ", e);
         }
     }
 
@@ -604,21 +607,17 @@ public class LoggerPlotter extends WindowAdapter {
     }
 
     public boolean checkLock() {
-        File lockFile = new File(folder + "\\lock.lock");
-        if (lockFile.exists()) {
-            //System.out.println("Locked");
-            return true;
-        } else {
-            //System.out.println("Unlocked");
-            return false;
-        }
+        File lockFile = new File(folder, "lock.lock");
+        return lockFile.exists(); //System.out.println("Locked");
+        //System.out.println("Unlocked");
     }
 
 }
 
 class DirWatcher extends TimerTask {
 
-    private static final Logger log = LogManager.getLogger(DirWatcher.class);
+    //private static final Logger logger = LogManager.getLogger(DirWatcher.class);
+    private static final Logger logger = Logger.getLogger(DirWatcher.class.getName());
 
     LoggerPlotter loggerPlotter = null;
 
@@ -652,6 +651,7 @@ class DirWatcher extends TimerTask {
         oldLogFileLength = 0;
     }
 
+    @Override
     public void run() {
         timerCount++;
         //log.trace("Timer ", timerCount);
@@ -677,12 +677,12 @@ class DirWatcher extends TimerTask {
         if (loggerPlotter.chckbxAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
             File newLogFile = new File(todayLogFileName);
             if (newLogFile.exists()) {
-                log.info("Today log file found. Changing to " + todayLogFileName);
+                logger.log(Level.INFO, "Today log file found. Changing to {0}", todayLogFileName);
                 logFileName = todayLogFileName;
                 loggerPlotter.txtFileName.setText(logFileName);
                 loggerPlotter.setFileLog(logFileName);
                 loggerPlotter.folder = newLogFile.getParent();
-                oldDirList = new LinkedList<String>();
+                oldDirList = new LinkedList<>();
                 oldLogFileLength = 0;
                 loggerPlotter.logViewTable.readFile(logFileName);
             }
@@ -696,12 +696,12 @@ class DirWatcher extends TimerTask {
         if (logFileLength <= oldLogFileLength) {
             return;
         }
-        log.trace("Logfile length has increaed.");
+        logger.info("Logfile length has increaed.");
         try {
             FileWriter fw = new FileWriter(logFile, true);
             fw.close();
         } catch (IOException e) {
-            log.trace("Log file is not writable.");
+            logger.info("Log file is not writable.");
             return;
         }
 
@@ -736,7 +736,7 @@ class DirWatcher extends TimerTask {
         }
 
         if (addedFileName != null) {
-            log.trace("New files found. Replot.");
+            logger.info("New files found. Replot.");
             timerCount = 0;
             loggerPlotter.logViewTable.readFile(logFileName);
         }
