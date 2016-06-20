@@ -462,7 +462,7 @@ public class LogViewTable extends JTable {
                 ntcm.addColumn(tcm.getColumn(index));
                 //System.out.printf("Switch %s %d and %d\n", column, index, i);
             } else {
-                addColumn(column);
+                //addColumn(column);
             }
         }
         setColumnModel(ntcm);
