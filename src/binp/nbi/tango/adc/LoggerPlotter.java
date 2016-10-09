@@ -632,21 +632,14 @@ public class LoggerPlotter extends WindowAdapter {
 
     //**************************************************************************
     class DirWatcher extends TimerTask {
-        //private static final Logger LOGGER = Logger.getLogger(DirWatcher.class.getName());
-
         LoggerPlotter loggerPlotter = null;
-
         int timerCount = 0;
         int timerCountMax = 15;
-
         String folder = "";
         int oldnFiles = 0;
         int nFiles = 0;
         int count = 0;
-        //String[] oldDirList = new String[0];
-        //String[] dirList = new String[0];
         long oldLogFileLength = 0;
-
         List<String> dirList;
         List<String> oldDirList;
 
