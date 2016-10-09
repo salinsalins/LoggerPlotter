@@ -21,7 +21,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -54,19 +56,23 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 //import org.apache.logging.log4j.Logger;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import javax.swing.SwingWorker;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.DefaultXYDataset;
 
 import org.jfree.data.xy.XYSeries;
 
 public class LoggerPlotter extends WindowAdapter {
-
     //private static final Logger logger = LogManager.getLogger(LoggerPlotter.class);
-    private static final Logger logger = Logger.getLogger(LoggerPlotter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LoggerPlotter.class.getName());
 
     public static final String version = "3.0";
 
-    private File fileLog;
-    private File fileZip;
-    //String[] dirList;
+    private File logFile;
+    private File zipFile;
+    private File rootFolder;
 
     String folder = ".\\";
 
@@ -103,10 +109,10 @@ public class LoggerPlotter extends WindowAdapter {
                     //UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
                     window = new LoggerPlotter();
                     window.frame.setVisible(true);
-                    logger.log(Level.INFO, "LoggerPlotter " + version + " started.");
-                } catch (Exception e) {
-                    //log.error("LoggerPlotter start error ", e);
-                    e.printStackTrace();
+                    LOGGER.log(Level.INFO, "LoggerPlotter " + version + " started.");
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, "LoggerPlotter run exceptoin");
+                    LOGGER.log(Level.INFO, "Exception info", ex);
                 }
             }
         });
@@ -116,7 +122,7 @@ public class LoggerPlotter extends WindowAdapter {
      * Create the application. Default constructor.
      */
     public LoggerPlotter() {
-        logger.setLevel(Level.FINEST);
+        LOGGER.setLevel(Level.FINEST);
         initialize();
     }
 
@@ -225,10 +231,10 @@ public class LoggerPlotter extends WindowAdapter {
                 fileChooser.setCurrentDirectory(new File(folder));
                 int result = fileChooser.showDialog(null, "Open Log File");
                 if (result == JFileChooser.APPROVE_OPTION) {
-                    fileLog = fileChooser.getSelectedFile();
-                    folder = fileLog.getParent();
-                    String logFileName = fileLog.getAbsolutePath();
-                    logger.fine("Using file " + logFileName);
+                    logFile = fileChooser.getSelectedFile();
+                    folder = logFile.getParent();
+                    String logFileName = logFile.getAbsolutePath();
+                    LOGGER.fine("Using file " + logFileName);
                     txtFileName.setText(logFileName);
                     logViewTable.readFile(logFileName);
 
@@ -237,8 +243,6 @@ public class LoggerPlotter extends WindowAdapter {
                     timer = new Timer();
                     timer.schedule(timerTask, 2000, 1000);
 
-                    //String zipFileName = "f:\\eclipse\\data\\2015-12-10\\2015-12-10_172642.zip";
-                    //System.out.println(folder + "\\" + logViewTable.files.getLast().getName());
                     readZipFile(folder + "\\" + logViewTable.files.getLast().getName());
                 }
             }
@@ -265,10 +269,11 @@ public class LoggerPlotter extends WindowAdapter {
         chckbxShowHyst.setBounds(15, 126, 195, 23);
         configPane.add(chckbxShowHyst);
 
-        /*		JComboBox<String> comboBox = new JComboBox<String>();
-		comboBox.setBounds(5, 269, 100, 23);
-		configPane.add(comboBox);
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"One", "Two", "Three"}));
+        /*
+        JComboBox<String> comboBox = new JComboBox<String>();
+        comboBox.setBounds(5, 269, 100, 23);
+        configPane.add(comboBox);
+        comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"One", "Two", "Three"}));
          */
         JScrollPane scrollPane_2 = new JScrollPane();
         JLabel lbl_2 = new JLabel("Incuded columns");
@@ -345,7 +350,7 @@ public class LoggerPlotter extends WindowAdapter {
 
             logFileName = (String) objIStrm.readObject();
             txtFileName.setText(logFileName);
-            fileLog = new File(logFileName);
+            logFile = new File(logFileName);
 
             String str = (String) objIStrm.readObject();
             folder = str;
@@ -366,9 +371,9 @@ public class LoggerPlotter extends WindowAdapter {
 
             objIStrm.close();
 
-            logger.info("Config restored.");
+            LOGGER.info("Config restored.");
         } catch (IOException | ClassNotFoundException e) {
-            logger.log(Level.WARNING, "Config read error {0}", e);
+            LOGGER.log(Level.WARNING, "Config read error {0}", e);
         }
         timer.cancel();
         timer = new Timer();
@@ -402,7 +407,7 @@ public class LoggerPlotter extends WindowAdapter {
                             dimLineColor();
                         }
                     } catch (Exception e) {
-                        logger.log(Level.WARNING, "Selection change exception ", e);
+                        LOGGER.log(Level.WARNING, "Selection change exception ", e);
                         //panel.removeAll();
                     }
                 }
@@ -417,7 +422,7 @@ public class LoggerPlotter extends WindowAdapter {
 
         Rectangle bounds = frame.getBounds();
         String txt = txtFileName.getText();
-        txt = fileLog.getAbsolutePath();
+        txt = logFile.getAbsolutePath();
         String txt1 = txtarExcludedColumns.getText();
         String txt2 = txtarIncludedColumns.getText();
         boolean sm = chckbxShowMarkers.isSelected();
@@ -434,9 +439,9 @@ public class LoggerPlotter extends WindowAdapter {
             objOStrm.writeObject(sp);
             objOStrm.writeObject(columnNames);
             objOStrm.close();
-            logger.info("Config saved.");
+            LOGGER.info("Config saved.");
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Config write error ", e);
+            LOGGER.log(Level.WARNING, "Config write error ", e);
         }
     }
 
@@ -590,7 +595,7 @@ public class LoggerPlotter extends WindowAdapter {
     }
 
     public String getLogFileName() {
-        return fileLog.getAbsolutePath();
+        return logFile.getAbsolutePath();
         //return txtFileName.getText();
     }
 
@@ -600,27 +605,27 @@ public class LoggerPlotter extends WindowAdapter {
     }
 
     public File getFileLog() {
-        return fileLog;
+        return logFile;
     }
 
     public void setFileLog(File file) {
-        fileLog = file;
+        logFile = file;
     }
 
     public void setFileLog(String fileName) {
-        fileLog = new File(fileName);
+        logFile = new File(fileName);
     }
 
     public File getFileZip() {
-        return fileZip;
+        return zipFile;
     }
 
     public File getFileFolder() {
-        return fileLog.getParentFile();
+        return logFile.getParentFile();
     }
 
     public File getRootFolder() {
-        return fileLog.getParentFile().getParentFile().getParentFile().getParentFile();
+        return logFile.getParentFile().getParentFile().getParentFile().getParentFile();
     }
 
     public boolean checkLock() {
@@ -629,137 +634,248 @@ public class LoggerPlotter extends WindowAdapter {
         //System.out.println("Unlocked");
     }
 
-}
+    //****************************************************************************
+    class DirWatcher extends TimerTask {
+        //private static final Logger LOGGER = Logger.getLogger(DirWatcher.class.getName());
 
-class DirWatcher extends TimerTask {
+        LoggerPlotter loggerPlotter = null;
 
-    //private static final Logger logger = LogManager.getLogger(DirWatcher.class);
-    private static final Logger logger = Logger.getLogger(DirWatcher.class.getName());
+        int timerCount = 0;
+        int timerCountMax = 15;
 
-    LoggerPlotter loggerPlotter = null;
+        String folder = "";
+        int oldnFiles = 0;
+        int nFiles = 0;
+        int count = 0;
+        //String[] oldDirList = new String[0];
+        //String[] dirList = new String[0];
+        long oldLogFileLength = 0;
 
-    int timerCount = 0;
-    int timerCountMax = 15;
+        List<String> dirList;
+        List<String> oldDirList;
 
-    String folder = "";
-    int oldnFiles = 0;
-    int nFiles = 0;
-    int count = 0;
-    //String[] oldDirList = new String[0];
-    //String[] dirList = new String[0];
-    long oldLogFileLength = 0;
+        public DirWatcher(LoggerPlotter lp) {
+            timerCount = 0;
+            timerCountMax = 15;
 
-    LinkedList<String> dirList;
-    LinkedList<String> oldDirList;
-
-    public DirWatcher(LoggerPlotter lp) {
-        ///super();
-        timerCount = 0;
-        timerCountMax = 15;
-
-        this.loggerPlotter = lp;
-        this.folder = lp.folder;
-        File dir = new File(folder);
-        //oldDirList = dir.list();
-        oldDirList = new LinkedList<>(Arrays.asList(dir.list()));
-        //oldnFiles = oldDirList.length;
-        oldnFiles = oldDirList.size();
-        count = 0;
-        oldLogFileLength = 0;
-    }
-
-    @Override
-    public void run() {
-        timerCount++;
-        //log.trace("Timer ", timerCount);
-        if (timerCount == timerCountMax) {
-            loggerPlotter.dimLineColor();
-            //timerCount = 0;
-            //log.trace("Line color dimmed.");
-        }
-        // Current log file name
-        String logFileName = loggerPlotter.getLogFileName();
-        //log.trace("Log file name " + logFileName);
-        if (logFileName == null) {
-            return;
+            this.loggerPlotter = lp;
+            this.folder = lp.folder;
+            File dir = new File(folder);
+            oldDirList = Arrays.asList(dir.list());
+            oldnFiles = oldDirList.size();
+            count = 0;
+            oldLogFileLength = 0;
         }
 
-        // Determine today log file name
-        String rootFolder = loggerPlotter.getRootFolderName();
-        String todayFolder = LoggerDumper.getLogFolderName();
-        String todayFile = LoggerDumper.getLogFileName();
-        String todayLogFileName = rootFolder + "\\" + todayFolder + "\\" + todayFile;
-        //log.trace("Today log file name " + todayLogFileName);
-
-        if (loggerPlotter.chckbxAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
-            File newLogFile = new File(todayLogFileName);
-            if (newLogFile.exists()) {
-                logger.log(Level.INFO, "Today log file found. Changing to {0}", todayLogFileName);
-                logFileName = todayLogFileName;
-                loggerPlotter.txtFileName.setText(logFileName);
-                loggerPlotter.setFileLog(logFileName);
-                loggerPlotter.folder = newLogFile.getParent();
-                oldDirList = new LinkedList<>();
-                oldLogFileLength = 0;
-                loggerPlotter.logViewTable.readFile(logFileName);
+        @Override
+        public void run() {
+            timerCount++;
+            //log.trace("Timer ", timerCount);
+            if (timerCount == timerCountMax) {
+                loggerPlotter.dimLineColor();
+                //timerCount = 0;
+                //log.trace("Line color dimmed.");
             }
-        }
-        if (loggerPlotter.checkLock()) {
-            return;
-        }
+            // Current log file name
+            String logFileName = loggerPlotter.getLogFileName();
+            //log.trace("Log file name " + logFileName);
+            if (logFileName == null) {
+                return;
+            }
 
-        File logFile = new File(logFileName);
-        long logFileLength = logFile.length();
-        if (logFileLength <= oldLogFileLength) {
-            return;
-        }
-        logger.info("Logfile length has increaed.");
-        try {
-            FileWriter fw = new FileWriter(logFile, true);
-            fw.close();
-        } catch (IOException e) {
-            logger.info("Log file is not writable.");
-            return;
-        }
+            // Determine today log file name
+            String rootFolder = loggerPlotter.getRootFolderName();
+            String todayFolder = LoggerDumper.getLogFolderName();
+            String todayFile = LoggerDumper.getLogFileName();
+            String todayLogFileName = rootFolder + "\\" + todayFolder + "\\" + todayFile;
+            //log.trace("Today log file name " + todayLogFileName);
 
-        File dir = new File(loggerPlotter.folder);
-        String[] dirListArray = dir.list();
-        dirList = new LinkedList<String>(Arrays.asList(dirListArray));
-        //nFiles = dirList.length;
-        nFiles = dirList.size();
-
-        String addedFileName = null;
-        int addedFiles = 0;
-        for (String str : dirList) {
-            //if (!StrArr.contains(oldDirList, str)) { 
-            if (!oldDirList.contains(str)) {
-                //log.trace("Added file " + str);
-                if (str.endsWith(".zip")) {
-                    addedFileName = str;
-                    addedFiles++;
+            if (loggerPlotter.chckbxAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
+                File newLogFile = new File(todayLogFileName);
+                if (newLogFile.exists()) {
+                    LOGGER.log(Level.INFO, "Today log file found. Changing to {0}", todayLogFileName);
+                    logFileName = todayLogFileName;
+                    loggerPlotter.txtFileName.setText(logFileName);
+                    loggerPlotter.setFileLog(logFileName);
+                    loggerPlotter.folder = newLogFile.getParent();
+                    oldDirList = new LinkedList<>();
+                    oldLogFileLength = 0;
+                    loggerPlotter.logViewTable.readFile(logFileName);
                 }
             }
-        }
+            if (loggerPlotter.checkLock()) {
+                return;
+            }
 
-        String deletedFileName = null;
-        int deletedFiles = 0;
-        for (String str : oldDirList) {
-            //if (!StrArr.contains(dirList, str)) { 
-            if (!dirList.contains(str)) {
-                //log.trace("Deleted file " + str);
-                deletedFileName = str;
-                deletedFiles++;
+            File logFile = new File(logFileName);
+            long logFileLength = logFile.length();
+            if (logFileLength <= oldLogFileLength) {
+                return;
+            }
+            LOGGER.info("Logfile length has increaed.");
+            try {
+                FileWriter fw = new FileWriter(logFile, true);
+                fw.close();
+            } catch (IOException e) {
+                LOGGER.info("Log file is not writable.");
+                return;
+            }
+
+            File dir = new File(loggerPlotter.folder);
+            String[] dirListArray = dir.list();
+            dirList = Arrays.asList(dirListArray);
+            nFiles = dirList.size();
+
+            String addedFileName = null;
+            int addedFiles = 0;
+            for (String str : dirList) {
+                if (!oldDirList.contains(str)) {
+                    if (str.endsWith(".zip")) {
+                        addedFileName = str;
+                        addedFiles++;
+                    }
+                }
+            }
+
+            String deletedFileName = null;
+            int deletedFiles = 0;
+            for (String str : oldDirList) {
+                if (!dirList.contains(str)) {
+                    deletedFileName = str;
+                    deletedFiles++;
+                }
+            }
+
+            if (addedFileName != null) {
+                LOGGER.info("New files found. Replot.");
+                timerCount = 0;
+                loggerPlotter.logViewTable.readFile(logFileName);
+            }
+
+            oldnFiles = nFiles;
+            oldDirList = dirList;
+            oldLogFileLength = logFileLength;
+        }
+    }
+
+    //****************************************************************************
+        class Task extends SwingWorker<Void, Void> {
+
+            LoggerPlotter loggerPlotter = null;
+            long timerCount = 0l;
+            long timerCountMax = 15000l;
+            String folder = "";
+            int oldnFiles = 0;
+            int nFiles = 0;
+            int count = 0;
+            long oldLogFileLength = 0;
+            List<String> dirList;
+            List<String> oldDirList;
+            int addedFiles = 0;
+            String logFileName;
+
+            Task(LoggerPlotter lp) {
+                loggerPlotter = lp;
+                timerCount = 0;
+                timerCountMax = 15;
+                folder = lp.folder;
+                File dir = new File(folder);
+                oldDirList = Arrays.asList(dir.list());
+                oldnFiles = oldDirList.size();
+                count = 0;
+                oldLogFileLength = 0;
+                logFileName = loggerPlotter.getLogFileName();
+            }
+
+            /**
+             * Main task. Executed in background thread.
+             */
+            @Override
+            public Void doInBackground() {
+                timerCount++;
+                //log.trace("Timer ", timerCount);
+
+                // Current log file name
+                logFileName = loggerPlotter.getLogFileName();
+                if (logFileName == null) {
+                    return null;
+                }
+                // Determine today log file name
+                String rootFolder = loggerPlotter.getRootFolderName();
+                String todayFolder = LoggerDumper.getLogFolderName();
+                String todayFile = LoggerDumper.getLogFileName();
+                String todayLogFileName = rootFolder + "\\" + todayFolder + "\\" + todayFile;
+
+                if (loggerPlotter.chckbxAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
+                    File newLogFile = new File(todayLogFileName);
+                    if (newLogFile.exists()) {
+                        LOGGER.log(Level.INFO, "Today log file found. Changing to {0}", todayLogFileName);
+                        logFileName = todayLogFileName;
+                        loggerPlotter.txtFileName.setText(logFileName);
+                        loggerPlotter.setFileLog(logFileName);
+                        loggerPlotter.folder = newLogFile.getParent();
+                        oldDirList = new LinkedList<>();
+                        oldLogFileLength = 0;
+                        loggerPlotter.logViewTable.readFile(logFileName);
+                    }
+                }
+                if (loggerPlotter.checkLock()) {
+                    return null;
+                }
+
+                File logFile = new File(logFileName);
+                long logFileLength = logFile.length();
+                if (logFileLength <= oldLogFileLength) {
+                    return null;
+                }
+                LOGGER.info("Logfile length has increaed.");
+                if (!logFile.canWrite()) {
+                    LOGGER.severe("Log file is not writable.");
+                    return null;
+                }
+
+                File dir = new File(loggerPlotter.folder);
+                String[] dirListArray = dir.list();
+                dirList = Arrays.asList(dirListArray);
+                nFiles = dirList.size();
+
+                addedFiles = 0;
+                for (String str : dirList) {
+                    if (!oldDirList.contains(str)) {
+                        if (str.endsWith(".zip")) {
+                            LOGGER.fine("Added zip file " + str);
+                            addedFiles++;
+                        }
+                    }
+                }
+
+                oldnFiles = nFiles;
+                oldDirList = dirList;
+                oldLogFileLength = logFileLength;
+
+                return null;
+            }
+
+            @Override
+            protected void process(List<Void> chunks) {
+                if (timerCount == timerCountMax) {
+                    loggerPlotter.dimLineColor();
+                    LOGGER.fine("Line color dimmed");
+                }
+                if (addedFiles > 0) {
+                    LOGGER.info("New files found. Replot.");
+                    timerCount = 0;
+                    loggerPlotter.logViewTable.readFile(logFileName);
+                }
+            }
+
+            /**
+             * Executed in event dispatching thread
+             */
+            @Override
+            public void done() {
+                //taskOutput.append("Done!\n");
             }
         }
 
-        if (addedFileName != null) {
-            logger.info("New files found. Replot.");
-            timerCount = 0;
-            loggerPlotter.logViewTable.readFile(logFileName);
-        }
-
-        oldnFiles = nFiles;
-        oldDirList = dirList;
-        oldLogFileLength = logFileLength;
-    }
 }
