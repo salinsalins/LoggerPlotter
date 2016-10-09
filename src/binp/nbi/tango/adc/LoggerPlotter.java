@@ -65,7 +65,6 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 
 public class LoggerPlotter extends WindowAdapter {
-    //private static final Logger logger = LogManager.getLogger(LoggerPlotter.class);
     private static final Logger LOGGER = Logger.getLogger(LoggerPlotter.class.getName());
 
     public static final String version = "3.0";
