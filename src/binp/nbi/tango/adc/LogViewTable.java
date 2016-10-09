@@ -445,7 +445,6 @@ public class LogViewTable extends JTable {
     public List<String> getColumnNames() {
         List<String> list = new LinkedList<>();
         for (int i=0; i < getColumnCount(); i++) {
-            //System.out.printf("%d %s\n", i, getColumnName(i));
             list.add(getColumnName(i));
         }
         return list;
