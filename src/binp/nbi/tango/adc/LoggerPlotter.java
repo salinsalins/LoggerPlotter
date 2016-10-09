@@ -336,6 +336,13 @@ public class LoggerPlotter extends WindowAdapter {
         txtarExcludedColumns.setText("File\nRF_PHASE\nS_C1(A)");
         scrollPane_3.setViewportView(txtarExcludedColumns);
     }
+    
+    private void restartTimerTask() {
+        timer.cancel();
+        timer = new Timer();
+        timerTask = new DirWatcher(window);
+        timer.schedule(timerTask, 2000, 1000);
+    }
 
     private void restoreConfig() {
         String logFileName = null;
@@ -373,14 +380,11 @@ public class LoggerPlotter extends WindowAdapter {
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.log(Level.WARNING, "Config read error {0}", e);
         }
-        timer.cancel();
-        timer = new Timer();
-        timerTask = new DirWatcher(window);
-        timer.schedule(timerTask, 2000, 1000);
+        
+        restartTimerTask();
 
         logViewTable.readFile(logFileName);
         logViewTable.setColumnNames(columnNames);
-        columnNames = logViewTable.getColumnNames();
         // Add event listener for logview table
         ListSelectionModel rowSM = logViewTable.getSelectionModel();
         rowSM.addListSelectionListener(new ListSelectionListener() {
@@ -406,7 +410,6 @@ public class LoggerPlotter extends WindowAdapter {
                         }
                     } catch (Exception e) {
                         LOGGER.log(Level.WARNING, "Selection change exception ", e);
-                        //panel.removeAll();
                     }
                 }
             }
