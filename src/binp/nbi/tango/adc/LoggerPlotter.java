@@ -66,12 +66,11 @@ import org.jfree.data.xy.XYSeries;
 
 public class LoggerPlotter extends WindowAdapter {
     private static final Logger LOGGER = Logger.getLogger(LoggerPlotter.class.getName());
-
     public static final String version = "3.0";
 
     private File logFile;
     private File zipFile;
-    private File rootFolder;
+    private File rootFolder = new File(".\\");
 
     String folder = ".\\";
 
@@ -438,9 +437,10 @@ public class LoggerPlotter extends WindowAdapter {
             objOStrm.writeObject(sp);
             objOStrm.writeObject(columnNames);
             objOStrm.close();
-            LOGGER.info("Config saved.");
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Config write error ", e);
+            LOGGER.fine("Config saved.");
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "Config write error");
+            LOGGER.log(Level.INFO, "Exception info", ex);
         }
     }
 
@@ -474,10 +474,8 @@ public class LoggerPlotter extends WindowAdapter {
 
         int n = panel.getComponentCount();
         Component[] components = panel.getComponents();
-        //log.trace(n);
 
         panel.removeAll();
-        //List<String> columnList = logViewTable.get();
         for (String str : signalList) {
             SignalChartPanel chart = new SignalChartPanel();
             chart.readParameters(fileName, str);
@@ -551,41 +549,39 @@ public class LoggerPlotter extends WindowAdapter {
         lblZipFileName.setText("File : " + fileName);
     }
 
-    List<String> readDirZip(String folder) {
-        File dir = new File(folder);
-        return readDirZip(dir);
-    }
+    List<String> listDirectory(File dir, String extension) {
+        List<String> result = new LinkedList<>();
 
-    List<String> readDirZip(File dir) {
         if (dir.isFile()) {
             dir = dir.getParentFile();
         }
-
-        LinkedList<String> result = new LinkedList<String>();
         if (!dir.isDirectory()) {
             return result;
         }
-
         String[] dirList = dir.list();
         if (dirList == null) {
             return result;
         }
-        String folder = dir.getName() + File.pathSeparator;
+        String folder = dir.getAbsolutePath() + File.pathSeparator;
         for (String str : dirList) {
-            if (str.endsWith(".zip")) {
+            if (str.endsWith(extension)) {
                 result.add(folder + str);
             }
         }
         return result;
     }
 
+    /**
+     *
+     * @param panel
+     * @param color
+     */
     public static void setLineColor(JPanel panel, Color color) {
         Component[] plots = panel.getComponents();
         for (Component p : plots) {
-            if (!(p instanceof SignalChartPanel)) {
-                continue;
+            if (p instanceof SignalChartPanel) {
+                ((SignalChartPanel) p).setLineColor(2, color);
             }
-            ((SignalChartPanel) p).setLineColor(2, color);
         }
     }
 
@@ -629,11 +625,12 @@ public class LoggerPlotter extends WindowAdapter {
 
     public boolean checkLock() {
         File lockFile = new File(folder, "lock.lock");
-        return lockFile.exists(); //System.out.println("Locked");
+        return lockFile.exists(); 
+        //System.out.println("Locked");
         //System.out.println("Unlocked");
     }
 
-    //****************************************************************************
+    //**************************************************************************
     class DirWatcher extends TimerTask {
         //private static final Logger LOGGER = Logger.getLogger(DirWatcher.class.getName());
 
@@ -757,8 +754,8 @@ public class LoggerPlotter extends WindowAdapter {
         }
     }
 
-    //****************************************************************************
-        class Task extends SwingWorker<Void, Void> {
+    //**************************************************************************
+    class Task extends SwingWorker<Void, Void> {
 
             LoggerPlotter loggerPlotter = null;
             long timerCount = 0l;
