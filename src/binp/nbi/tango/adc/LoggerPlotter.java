@@ -574,11 +574,6 @@ public class LoggerPlotter extends WindowAdapter {
         return result;
     }
 
-    /**
-     *
-     * @param panel
-     * @param color
-     */
     public static void setLineColor(JPanel panel, Color color) {
         Component[] plots = panel.getComponents();
         for (Component p : plots) {
