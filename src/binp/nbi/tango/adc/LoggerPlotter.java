@@ -57,6 +57,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager.LookAndFeelInfo;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -104,7 +105,13 @@ public class LoggerPlotter extends WindowAdapter {
             @Override
             public void run() {
                 try {
-                    //UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+                    //for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    //    if ("Nimbus".equals(info.getName())) {
+                    //        UIManager.setLookAndFeel(info.getClassName());
+                    //        break;
+                    //    }
+                    //}
+                    //UIManager.setLookAndFeel("sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
                     window = new LoggerPlotter();
                     window.frame.setVisible(true);
                     LOGGER.log(Level.INFO, "LoggerPlotter " + version + " started.");
@@ -140,17 +147,17 @@ public class LoggerPlotter extends WindowAdapter {
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         frame.getContentPane().add(tabbedPane, "name_5266296004328937");
 
-    // Signals and Log Tab		
+        // Signals and Log Tab		
         JSplitPane splitPane = new JSplitPane();
         splitPane.setResizeWeight(0.9);
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         tabbedPane.addTab("Signals and Log", null, splitPane, null);
 
-        JScrollPane scrollPane = new JScrollPane();
-        splitPane.setRightComponent(scrollPane);
+        JScrollPane scrollPane_0 = new JScrollPane();
+        splitPane.setRightComponent(scrollPane_0);
 
         logViewTable = new LogViewTable();
-        scrollPane.setViewportView(logViewTable);
+        scrollPane_0.setViewportView(logViewTable);
         logViewTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
@@ -183,7 +190,8 @@ public class LoggerPlotter extends WindowAdapter {
                 //log.trace("Reread file for logViewTable");
             }
         });
-    // Config Tab		
+    
+        // Config Tab		
         JPanel configPane = new JPanel();
         tabbedPane.addTab("Configuraton", null, configPane, null);
         configPane.setLayout(null);
@@ -273,6 +281,7 @@ public class LoggerPlotter extends WindowAdapter {
         configPane.add(comboBox);
         comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"One", "Two", "Three"}));
          */
+        
         JScrollPane scrollPane_2 = new JScrollPane();
         JLabel lbl_2 = new JLabel("Included columns");
         lbl_2.setHorizontalAlignment(SwingConstants.CENTER);
@@ -348,33 +357,33 @@ public class LoggerPlotter extends WindowAdapter {
         String logFileName = null;
         List<String> columnNames = new LinkedList<>();
         try {
-            ObjectInputStream objIStrm = new ObjectInputStream(new FileInputStream("config.dat"));
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("config.dat"));
 
-            Rectangle bounds = (Rectangle) objIStrm.readObject();
+            Rectangle bounds = (Rectangle) ois.readObject();
             frame.setBounds(bounds);
 
-            logFileName = (String) objIStrm.readObject();
+            logFileName = (String) ois.readObject();
             txtFileName.setText(logFileName);
             logFile = new File(logFileName);
 
-            String str = (String) objIStrm.readObject();
+            String str = (String) ois.readObject();
             folder = str;
 
-            str = (String) objIStrm.readObject();
+            str = (String) ois.readObject();
             txtarExcludedColumns.setText(str);
 
-            str = (String) objIStrm.readObject();
+            str = (String) ois.readObject();
             txtarIncludedColumns.setText(str);
 
-            boolean sm = (boolean) objIStrm.readObject();
+            boolean sm = (boolean) ois.readObject();
             chckbxShowMarkers.setSelected(sm);
 
-            boolean sp = (boolean) objIStrm.readObject();
+            boolean sp = (boolean) ois.readObject();
             chckbxShowPreviousShot.setSelected(sp);
             
-            columnNames = (List<String>) objIStrm.readObject();
+            columnNames = (List<String>) ois.readObject();
 
-            objIStrm.close();
+            ois.close();
 
             LOGGER.info("Config restored.");
         } catch (IOException | ClassNotFoundException e) {
@@ -386,8 +395,8 @@ public class LoggerPlotter extends WindowAdapter {
         logViewTable.readFile(logFileName);
         logViewTable.setColumnNames(columnNames);
         // Add event listener for logview table
-        ListSelectionModel rowSM = logViewTable.getSelectionModel();
-        rowSM.addListSelectionListener(new ListSelectionListener() {
+        ListSelectionModel lsm = logViewTable.getSelectionModel();
+        lsm.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent event) {
                 //Ignore extra messages.
