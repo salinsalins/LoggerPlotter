@@ -271,7 +271,7 @@ public class LoggerPlotter extends WindowAdapter {
         chckbxShowPreviousShot.setBounds(210, 96, 195, 23);
         configPane.add(chckbxShowPreviousShot);
 
-        chckbxShowHyst = new JCheckBox("Show Hystogramm");
+        chckbxShowHyst = new JCheckBox("Show  Hystogramm");
         chckbxShowHyst.setBounds(15, 126, 195, 23);
         configPane.add(chckbxShowHyst);
 
