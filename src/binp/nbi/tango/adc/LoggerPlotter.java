@@ -274,7 +274,7 @@ public class LoggerPlotter extends WindowAdapter {
         comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"One", "Two", "Three"}));
          */
         JScrollPane scrollPane_2 = new JScrollPane();
-        JLabel lbl_2 = new JLabel("Incuded columns");
+        JLabel lbl_2 = new JLabel("Included columns");
         lbl_2.setHorizontalAlignment(SwingConstants.CENTER);
         //lbl_2.setFont(new Font("Tahoma", Font.PLAIN, 16));
         scrollPane_2.setColumnHeaderView(lbl_2);
@@ -306,7 +306,7 @@ public class LoggerPlotter extends WindowAdapter {
         scrollPane_2.setViewportView(txtarIncludedColumns);
 
         JScrollPane scrollPane_3 = new JScrollPane();
-        JLabel lbl_3 = new JLabel("Excuded columns");
+        JLabel lbl_3 = new JLabel("Excluded columns");
         lbl_3.setHorizontalAlignment(SwingConstants.CENTER);
         scrollPane_3.setColumnHeaderView(lbl_3);
         scrollPane_3.setBounds(180, 155, 160, 160);
