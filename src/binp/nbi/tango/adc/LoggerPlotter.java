@@ -95,6 +95,8 @@ public class LoggerPlotter extends WindowAdapter {
     JCheckBox chckbxShowPreviousShot;
     JCheckBox chckbxShowHyst;
 
+    NewJPanel njp_1;
+    
     /**
      * Launch the application.
      *
@@ -320,6 +322,13 @@ public class LoggerPlotter extends WindowAdapter {
         scrollPane_3.setColumnHeaderView(lbl_3);
         scrollPane_3.setBounds(180, 155, 160, 160);
         configPane.add(scrollPane_3);
+        
+        njp_1 = new NewJPanel();
+        njp_1.setBorder(new TitledBorder(new EtchedBorder(
+                EtchedBorder.LOWERED, null, null), "New Pane",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        njp_1.setBounds(5, 355, 360, 260);
+        configPane.add(njp_1);
 
         txtarExcludedColumns = new JTextArea();
         txtarExcludedColumns.getDocument().addDocumentListener(new DocumentListener() {
@@ -429,7 +438,7 @@ public class LoggerPlotter extends WindowAdapter {
 
     private void saveConfig() {
         timer.cancel();
-
+        
         Rectangle bounds = frame.getBounds();
         String txt = txtFileName.getText();
         txt = logFile.getAbsolutePath();
