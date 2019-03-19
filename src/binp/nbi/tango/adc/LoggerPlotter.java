@@ -114,7 +114,6 @@ public class LoggerPlotter extends WindowAdapter {
                     //        break;
                     //    }
                     //}
-                    //UIManager.setLookAndFeel("sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
                     window = new LoggerPlotter();
                     window.frame.setVisible(true);
                     LOGGER.log(Level.INFO, "LoggerPlotter " + version + " started.");
