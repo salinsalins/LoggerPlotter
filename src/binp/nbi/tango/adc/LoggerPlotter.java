@@ -94,7 +94,8 @@ public class LoggerPlotter extends WindowAdapter {
     JCheckBox chckbxShowMarkers;
     JCheckBox chckbxShowPreviousShot;
     JCheckBox chckbxShowHyst;
-
+    JCheckBox chckbxRemoveDuplicateShots;
+    
     NewJPanel njp_1;
     
     /**
@@ -257,7 +258,7 @@ public class LoggerPlotter extends WindowAdapter {
         });
         panelOpenFile.add(btnOpenFile);
 
-        JCheckBox chckbxRemoveDuplicateShots = new JCheckBox("Remove Duplicate Shots");
+        chckbxRemoveDuplicateShots = new JCheckBox("Remove Duplicate Shots");
         chckbxRemoveDuplicateShots.setBounds(15, 66, 195, 23);
         configPane.add(chckbxRemoveDuplicateShots);
 
@@ -277,13 +278,6 @@ public class LoggerPlotter extends WindowAdapter {
         chckbxShowHyst.setBounds(15, 126, 195, 23);
         configPane.add(chckbxShowHyst);
 
-        /*
-        JComboBox<String> comboBox = new JComboBox<String>();
-        comboBox.setBounds(5, 269, 100, 23);
-        configPane.add(comboBox);
-        comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"One", "Two", "Three"}));
-         */
-        
         JScrollPane scrollPane_2 = new JScrollPane();
         JLabel lbl_2 = new JLabel("Included columns");
         lbl_2.setHorizontalAlignment(SwingConstants.CENTER);
@@ -291,7 +285,6 @@ public class LoggerPlotter extends WindowAdapter {
         scrollPane_2.setColumnHeaderView(lbl_2);
         scrollPane_2.setBounds(5, 155, 160, 160);
         configPane.add(scrollPane_2);
-
         txtarIncludedColumns = new JTextArea();
         txtarIncludedColumns.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -322,14 +315,6 @@ public class LoggerPlotter extends WindowAdapter {
         scrollPane_3.setColumnHeaderView(lbl_3);
         scrollPane_3.setBounds(180, 155, 160, 160);
         configPane.add(scrollPane_3);
-        
-        njp_1 = new NewJPanel();
-        njp_1.setBorder(new TitledBorder(new EtchedBorder(
-                EtchedBorder.LOWERED, null, null), "New Pane",
-                TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        njp_1.setBounds(5, 355, 360, 260);
-        configPane.add(njp_1);
-
         txtarExcludedColumns = new JTextArea();
         txtarExcludedColumns.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -353,6 +338,14 @@ public class LoggerPlotter extends WindowAdapter {
         });
         txtarExcludedColumns.setText("File\nRF_PHASE\nS_C1(A)");
         scrollPane_3.setViewportView(txtarExcludedColumns);
+
+        njp_1 = new NewJPanel();
+        njp_1.setBorder(new TitledBorder(new EtchedBorder(
+                EtchedBorder.LOWERED, null, null), "New Pane",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        njp_1.setBounds(5, 355, 360, 260);
+        configPane.add(njp_1);
+
     }
     
     private void restartTimerTask() {
