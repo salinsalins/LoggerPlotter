@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Util"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/SignalPlotter"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/LoggerDumper"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Util"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ini4j-0.5.4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jfreechart-1.0.19"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/SignalPlotter"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

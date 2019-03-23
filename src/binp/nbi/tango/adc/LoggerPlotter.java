@@ -114,6 +114,7 @@ public class LoggerPlotter extends WindowAdapter {
                     //        break;
                     //    }
                     //}
+                    LOGGER.setLevel(Level.FINEST);
                     window = new LoggerPlotter();
                     window.frame.setVisible(true);
                     LOGGER.log(Level.INFO, "LoggerPlotter " + version + " started.");
@@ -129,7 +130,6 @@ public class LoggerPlotter extends WindowAdapter {
      * Create the application. Default constructor.
      */
     public LoggerPlotter() {
-        LOGGER.setLevel(Level.FINEST);
         initialize();
     }
 
@@ -483,6 +483,7 @@ public class LoggerPlotter extends WindowAdapter {
             return;
         }
 
+        LOGGER.severe("aaaaa "+fileName);
         List<String> signalList = SignalPlotter.readSignalList(fileName);
 
         int n = panel.getComponentCount();
