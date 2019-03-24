@@ -73,8 +73,8 @@ public class LoggerPlotter extends WindowAdapter {
                 "[%1$tF %1$tT] %4$-7s %2$s %5$s %6$s %n");
     }
     private static final Logger LOGGER = Logger.getLogger(LoggerPlotter.class.getName());
-	private static final ConsoleHandler handler = new ConsoleHandler();
-	static {
+    private static final ConsoleHandler handler = new ConsoleHandler();
+    static {
     	LOGGER.addHandler(handler);
     	LOGGER.setUseParentHandlers(false);
     	LOGGER.setLevel(Level.FINE);
@@ -367,7 +367,7 @@ public class LoggerPlotter extends WindowAdapter {
         timer.schedule(timerTask, 2000, 1000);
     }
 
-    private void restoreConfig() {
+    public void restoreConfig() {
         String logFileName = null;
         List<String> columnNames = new LinkedList<>();
         try {
@@ -441,7 +441,7 @@ public class LoggerPlotter extends WindowAdapter {
         logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
    }
 
-    private void saveConfig() {
+    public void saveConfig() {
         timer.cancel();
         
         Rectangle bounds = frame.getBounds();
@@ -452,6 +452,7 @@ public class LoggerPlotter extends WindowAdapter {
         boolean sm = jcbShowMarkers.isSelected();
         boolean sp = jcbShowPreviousShot.isSelected();
         List<String> columnNames = logViewTable.getColumnNames();
+        List<Object> state = njp_1.getState();
         try {
             ObjectOutputStream objOStrm = new ObjectOutputStream(new FileOutputStream("config.dat"));
             objOStrm.writeObject(bounds);
@@ -462,6 +463,7 @@ public class LoggerPlotter extends WindowAdapter {
             objOStrm.writeObject(sm);
             objOStrm.writeObject(sp);
             objOStrm.writeObject(columnNames);
+            objOStrm.writeObject(state);
             objOStrm.close();
             LOGGER.fine("Config saved.");
         } catch (IOException ex) {
