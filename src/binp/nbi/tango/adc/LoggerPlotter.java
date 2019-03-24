@@ -55,6 +55,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 //import org.apache.logging.log4j.LogManager;
 //import org.apache.logging.log4j.Logger;
 import java.util.logging.Logger;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -66,8 +67,21 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 
 public class LoggerPlotter extends WindowAdapter {
+	// configure logging
+	static {
+    	System.setProperty("java.util.logging.SimpleFormatter.format",
+                "[%1$tF %1$tT] %4$-7s %2$s %5$s %6$s %n");
+    }
     private static final Logger LOGGER = Logger.getLogger(LoggerPlotter.class.getName());
-    public static final String version = "3.0";
+	private static final ConsoleHandler handler = new ConsoleHandler();
+	static {
+    	LOGGER.addHandler(handler);
+    	LOGGER.setUseParentHandlers(false);
+    	LOGGER.setLevel(Level.FINE);
+    	handler.setLevel(Level.FINE);
+    }
+
+    public static final String version = "4.0";
 
     private File logFile;
     private File zipFile;
@@ -80,21 +94,21 @@ public class LoggerPlotter extends WindowAdapter {
 
     static LoggerPlotter window;
     private JFrame frame;
-    JTextField txtFileName;
+    JTextField jtfFileName;
     LogViewTable logViewTable;
-    JPanel panel;
+    JPanel jpMainPanel;
     JLabel lblZipFileName;
 
-    JTextArea txtarIncludedColumns;
-    JTextArea txtarExcludedColumns;
+    JTextArea jtaIncCol;
+    JTextArea jtaExcCol;
 
-    Color freshColor = new Color(255, 255, 255);
-    Color dimmedColor = new Color(0, 255, 0);
-    JCheckBox chckbxAdjustForToday;
-    JCheckBox chckbxShowMarkers;
-    JCheckBox chckbxShowPreviousShot;
-    JCheckBox chckbxShowHyst;
-    JCheckBox chckbxRemoveDuplicateShots;
+    Color colFresh = new Color(255, 255, 255);
+    Color colDimmed = new Color(0, 255, 0);
+    JCheckBox jcbAdjustForToday;
+    JCheckBox jcbShowMarkers;
+    JCheckBox jcbShowPreviousShot;
+    JCheckBox jcbShowHyst;
+    JCheckBox jcbRemoveDuplicateShots;
     
     NewJPanel njp_1;
     
@@ -114,10 +128,9 @@ public class LoggerPlotter extends WindowAdapter {
                     //        break;
                     //    }
                     //}
-                    LOGGER.setLevel(Level.FINEST);
                     window = new LoggerPlotter();
                     window.frame.setVisible(true);
-                    LOGGER.log(Level.INFO, "LoggerPlotter " + version + " started.");
+                    LOGGER.log(Level.FINE, "LoggerPlotter " + version + " started.");
                 } catch (Exception ex) {
                     LOGGER.log(Level.SEVERE, "LoggerPlotter run exceptoin");
                     LOGGER.log(Level.INFO, "Exception info", ex);
@@ -172,9 +185,9 @@ public class LoggerPlotter extends WindowAdapter {
         JScrollPane scrollPane_1 = new JScrollPane();
         splitPane.setLeftComponent(scrollPane_1);
 
-        panel = new JPanel();
-        panel.setLayout(new GridLayout(0, 3, 5, 5));
-        scrollPane_1.setViewportView(panel);
+        jpMainPanel = new JPanel();
+        jpMainPanel.setLayout(new GridLayout(0, 3, 5, 5));
+        scrollPane_1.setViewportView(jpMainPanel);
 
         lblZipFileName = new JLabel("File :");
         lblZipFileName.setHorizontalAlignment(SwingConstants.CENTER);
@@ -208,16 +221,16 @@ public class LoggerPlotter extends WindowAdapter {
         SpringLayout sl_panelOpenFile = new SpringLayout();
         panelOpenFile.setLayout(sl_panelOpenFile);
         // Open file name text field in open file panel 
-        txtFileName = new JTextField();
-        sl_panelOpenFile.putConstraint(SpringLayout.NORTH, txtFileName,
+        jtfFileName = new JTextField();
+        sl_panelOpenFile.putConstraint(SpringLayout.NORTH, jtfFileName,
                 5, SpringLayout.NORTH, panelOpenFile);
-        sl_panelOpenFile.putConstraint(SpringLayout.SOUTH, txtFileName,
+        sl_panelOpenFile.putConstraint(SpringLayout.SOUTH, jtfFileName,
                 -5, SpringLayout.SOUTH, panelOpenFile);
-        sl_panelOpenFile.putConstraint(SpringLayout.EAST, txtFileName,
+        sl_panelOpenFile.putConstraint(SpringLayout.EAST, jtfFileName,
                 -55, SpringLayout.EAST, panelOpenFile);
-        sl_panelOpenFile.putConstraint(SpringLayout.WEST, txtFileName, 5,
+        sl_panelOpenFile.putConstraint(SpringLayout.WEST, jtfFileName, 5,
                 SpringLayout.WEST, panelOpenFile);
-        panelOpenFile.add(txtFileName);
+        panelOpenFile.add(jtfFileName);
         // Select file button in open file panel 
         JButton btnOpenFile = new JButton("...");
         sl_panelOpenFile.putConstraint(SpringLayout.NORTH, btnOpenFile, 5,
@@ -227,7 +240,7 @@ public class LoggerPlotter extends WindowAdapter {
         sl_panelOpenFile.putConstraint(SpringLayout.EAST, btnOpenFile, -5,
                 SpringLayout.EAST, panelOpenFile);
         sl_panelOpenFile.putConstraint(SpringLayout.WEST, btnOpenFile, 5,
-                SpringLayout.EAST, txtFileName);
+                SpringLayout.EAST, jtfFileName);
         // Click event for select file button - open file dialog 
         btnOpenFile.addMouseListener(new MouseAdapter() {
             @Override
@@ -243,7 +256,7 @@ public class LoggerPlotter extends WindowAdapter {
                     folder = logFile.getParent();
                     String logFileName = logFile.getAbsolutePath();
                     LOGGER.fine("Using file " + logFileName);
-                    txtFileName.setText(logFileName);
+                    jtfFileName.setText(logFileName);
                     logViewTable.readFile(logFileName);
 
                     timer.cancel();
@@ -257,25 +270,25 @@ public class LoggerPlotter extends WindowAdapter {
         });
         panelOpenFile.add(btnOpenFile);
 
-        chckbxRemoveDuplicateShots = new JCheckBox("Remove Duplicate Shots");
-        chckbxRemoveDuplicateShots.setBounds(15, 66, 195, 23);
-        configPane.add(chckbxRemoveDuplicateShots);
+        jcbRemoveDuplicateShots = new JCheckBox("Remove Duplicate Shots");
+        jcbRemoveDuplicateShots.setBounds(15, 66, 195, 23);
+        configPane.add(jcbRemoveDuplicateShots);
 
-        chckbxAdjustForToday = new JCheckBox("Adjust Data Folder for Today");
-        chckbxAdjustForToday.setBounds(210, 66, 195, 23);
-        configPane.add(chckbxAdjustForToday);
+        jcbAdjustForToday = new JCheckBox("Adjust Data Folder for Today");
+        jcbAdjustForToday.setBounds(210, 66, 195, 23);
+        configPane.add(jcbAdjustForToday);
 
-        chckbxShowMarkers = new JCheckBox("Show Markers");
-        chckbxShowMarkers.setBounds(15, 96, 195, 23);
-        configPane.add(chckbxShowMarkers);
+        jcbShowMarkers = new JCheckBox("Show Markers");
+        jcbShowMarkers.setBounds(15, 96, 195, 23);
+        configPane.add(jcbShowMarkers);
 
-        chckbxShowPreviousShot = new JCheckBox("Show Previous Plot");
-        chckbxShowPreviousShot.setBounds(210, 96, 195, 23);
-        configPane.add(chckbxShowPreviousShot);
+        jcbShowPreviousShot = new JCheckBox("Show Previous Plot");
+        jcbShowPreviousShot.setBounds(210, 96, 195, 23);
+        configPane.add(jcbShowPreviousShot);
 
-        chckbxShowHyst = new JCheckBox("Show  Hystogramm");
-        chckbxShowHyst.setBounds(15, 126, 195, 23);
-        configPane.add(chckbxShowHyst);
+        jcbShowHyst = new JCheckBox("Show  Hystogramm");
+        jcbShowHyst.setBounds(15, 126, 195, 23);
+        configPane.add(jcbShowHyst);
 
         JScrollPane scrollPane_2 = new JScrollPane();
         JLabel lbl_2 = new JLabel("Included columns");
@@ -284,8 +297,8 @@ public class LoggerPlotter extends WindowAdapter {
         scrollPane_2.setColumnHeaderView(lbl_2);
         scrollPane_2.setBounds(5, 155, 160, 160);
         configPane.add(scrollPane_2);
-        txtarIncludedColumns = new JTextArea();
-        txtarIncludedColumns.getDocument().addDocumentListener(new DocumentListener() {
+        jtaIncCol = new JTextArea();
+        jtaIncCol.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent ev) {
                 //log.trace("Change Update");
@@ -294,19 +307,19 @@ public class LoggerPlotter extends WindowAdapter {
             @Override
             public void insertUpdate(DocumentEvent ev) {
                 //log.trace("Insert Update");
-                logViewTable.setIncludedSignalNames(txtarIncludedColumns.getText());
+                logViewTable.setIncludedSignalNames(jtaIncCol.getText());
                 logViewTable.refreshOnShow = true;
             }
 
             @Override
             public void removeUpdate(DocumentEvent arg0) {
                 //log.trace("Remove Update");
-                logViewTable.setIncludedSignalNames(txtarIncludedColumns.getText());
+                logViewTable.setIncludedSignalNames(jtaIncCol.getText());
                 logViewTable.refreshOnShow = true;
             }
         });
-        txtarIncludedColumns.setText("Time\nShot\nU_ex");
-        scrollPane_2.setViewportView(txtarIncludedColumns);
+        jtaIncCol.setText("Time\nShot\nU_ex");
+        scrollPane_2.setViewportView(jtaIncCol);
 
         JScrollPane scrollPane_3 = new JScrollPane();
         JLabel lbl_3 = new JLabel("Excluded columns");
@@ -314,8 +327,8 @@ public class LoggerPlotter extends WindowAdapter {
         scrollPane_3.setColumnHeaderView(lbl_3);
         scrollPane_3.setBounds(180, 155, 160, 160);
         configPane.add(scrollPane_3);
-        txtarExcludedColumns = new JTextArea();
-        txtarExcludedColumns.getDocument().addDocumentListener(new DocumentListener() {
+        jtaExcCol = new JTextArea();
+        jtaExcCol.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent ev) {
                 //log.trace("Change Update");
@@ -324,19 +337,19 @@ public class LoggerPlotter extends WindowAdapter {
             @Override
             public void insertUpdate(DocumentEvent ev) {
                 //log.trace("Insert Update");
-                logViewTable.setExcludedSignalNames(txtarExcludedColumns.getText());
+                logViewTable.setExcludedSignalNames(jtaExcCol.getText());
                 logViewTable.refreshOnShow = true;
             }
 
             @Override
             public void removeUpdate(DocumentEvent arg0) {
                 //log.trace("Remove Update");
-                logViewTable.setExcludedSignalNames(txtarExcludedColumns.getText());
+                logViewTable.setExcludedSignalNames(jtaExcCol.getText());
                 logViewTable.refreshOnShow = true;
             }
         });
-        txtarExcludedColumns.setText("File\nRF_PHASE\nS_C1(A)");
-        scrollPane_3.setViewportView(txtarExcludedColumns);
+        jtaExcCol.setText("File\nRF_PHASE\nS_C1(A)");
+        scrollPane_3.setViewportView(jtaExcCol);
 
         njp_1 = new NewJPanel();
         njp_1.setBorder(new TitledBorder(new EtchedBorder(
@@ -364,23 +377,23 @@ public class LoggerPlotter extends WindowAdapter {
             frame.setBounds(bounds);
 
             logFileName = (String) ois.readObject();
-            txtFileName.setText(logFileName);
+            jtfFileName.setText(logFileName);
             logFile = new File(logFileName);
 
             String str = (String) ois.readObject();
             folder = str;
 
             str = (String) ois.readObject();
-            txtarExcludedColumns.setText(str);
+            jtaExcCol.setText(str);
 
             str = (String) ois.readObject();
-            txtarIncludedColumns.setText(str);
+            jtaIncCol.setText(str);
 
             boolean sm = (boolean) ois.readObject();
-            chckbxShowMarkers.setSelected(sm);
+            jcbShowMarkers.setSelected(sm);
 
             boolean sp = (boolean) ois.readObject();
-            chckbxShowPreviousShot.setSelected(sp);
+            jcbShowPreviousShot.setSelected(sp);
             
             columnNames = (List<String>) ois.readObject();
 
@@ -432,12 +445,12 @@ public class LoggerPlotter extends WindowAdapter {
         timer.cancel();
         
         Rectangle bounds = frame.getBounds();
-        String txt = txtFileName.getText();
+        String txt = jtfFileName.getText();
         txt = logFile.getAbsolutePath();
-        String txt1 = txtarExcludedColumns.getText();
-        String txt2 = txtarIncludedColumns.getText();
-        boolean sm = chckbxShowMarkers.isSelected();
-        boolean sp = chckbxShowPreviousShot.isSelected();
+        String txt1 = jtaExcCol.getText();
+        String txt2 = jtaIncCol.getText();
+        boolean sm = jcbShowMarkers.isSelected();
+        boolean sp = jcbShowPreviousShot.isSelected();
         List<String> columnNames = logViewTable.getColumnNames();
         try {
             ObjectOutputStream objOStrm = new ObjectOutputStream(new FileOutputStream("config.dat"));
@@ -486,21 +499,21 @@ public class LoggerPlotter extends WindowAdapter {
         LOGGER.severe("aaaaa "+fileName);
         List<String> signalList = SignalPlotter.readSignalList(fileName);
 
-        int n = panel.getComponentCount();
-        Component[] components = panel.getComponents();
+        int n = jpMainPanel.getComponentCount();
+        Component[] components = jpMainPanel.getComponents();
 
-        panel.removeAll();
+        jpMainPanel.removeAll();
         for (String str : signalList) {
             SignalChartPanel chart = new SignalChartPanel();
             chart.readParameters(fileName, str);
             if (logViewTable.findColumn(chart.getLabel()) >= 0) {
                 chart.readData(fileName, str);
                 chart.setChartParam();
-                chart.setLineColor(2, freshColor);
+                chart.setLineColor(2, colFresh);
                 chart.setPreferredSize(new Dimension(320, 250));
 
                 XYSeries prevSignal = null;
-                if (chckbxShowPreviousShot.isSelected()) {
+                if (jcbShowPreviousShot.isSelected()) {
                     for (Component component : components) {
                         if (component instanceof SignalChartPanel) {
                             SignalChartPanel c = (SignalChartPanel) component;
@@ -520,11 +533,11 @@ public class LoggerPlotter extends WindowAdapter {
                     }
                 }
 
-                if (!chckbxShowMarkers.isSelected()) {
+                if (!jcbShowMarkers.isSelected()) {
                     chart.clearPlotMarkers();
                 }
 
-                if (chckbxShowHyst.isSelected()) {
+                if (jcbShowHyst.isSelected()) {
                     prevSignal = chart.getSeries(2);
                     SignalChartPanel chartHyst = new SignalChartPanel();
                     n = prevSignal.getItemCount();
@@ -553,13 +566,13 @@ public class LoggerPlotter extends WindowAdapter {
                     }
 
                     chartHyst.addSeries(series);
-                    panel.add(chartHyst);
+                    jpMainPanel.add(chartHyst);
                 }
 
-                panel.add(chart);
+                jpMainPanel.add(chart);
             }
         }
-        panel.updateUI();
+        jpMainPanel.updateUI();
         lblZipFileName.setText("File : " + fileName);
     }
 
@@ -595,7 +608,7 @@ public class LoggerPlotter extends WindowAdapter {
     }
 
     public void dimLineColor() {
-        setLineColor(panel, dimmedColor);
+        setLineColor(jpMainPanel, colDimmed);
     }
 
     public String getLogFileName() {
@@ -659,10 +672,17 @@ public class LoggerPlotter extends WindowAdapter {
             this.loggerPlotter = lp;
             this.folder = lp.folder;
             File dir = new File(folder);
-            oldDirList = Arrays.asList(dir.list());
-            oldnFiles = oldDirList.size();
-            count = 0;
-            oldLogFileLength = 0;
+            String[] dl = dir.list();
+            if (dl != null) {
+            	oldDirList = Arrays.asList(dir.list());
+            }
+            else {
+            	LOGGER.log(Level.WARNING, "Directory {0} is not found", folder);
+            	oldDirList = new ArrayList<String>();
+            }
+        	oldnFiles = oldDirList.size();
+        	count = 0;
+        	oldLogFileLength = 0;
         }
 
         @Override
@@ -688,12 +708,12 @@ public class LoggerPlotter extends WindowAdapter {
             String todayLogFileName = rootFolder + "\\" + todayFolder + "\\" + todayFile;
             //log.trace("Today log file name " + todayLogFileName);
 
-            if (loggerPlotter.chckbxAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
+            if (loggerPlotter.jcbAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
                 File newLogFile = new File(todayLogFileName);
                 if (newLogFile.exists()) {
                     LOGGER.log(Level.INFO, "Today log file found. Changing to {0}", todayLogFileName);
                     logFileName = todayLogFileName;
-                    loggerPlotter.txtFileName.setText(logFileName);
+                    loggerPlotter.jtfFileName.setText(logFileName);
                     loggerPlotter.setFileLog(logFileName);
                     loggerPlotter.folder = newLogFile.getParent();
                     oldDirList = new LinkedList<>();
@@ -804,12 +824,12 @@ public class LoggerPlotter extends WindowAdapter {
                 String todayFile = LoggerDumper.getLogFileName();
                 String todayLogFileName = rootFolder + "\\" + todayFolder + "\\" + todayFile;
 
-                if (loggerPlotter.chckbxAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
+                if (loggerPlotter.jcbAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
                     File newLogFile = new File(todayLogFileName);
                     if (newLogFile.exists()) {
                         LOGGER.log(Level.INFO, "Today log file found. Changing to {0}", todayLogFileName);
                         logFileName = todayLogFileName;
-                        loggerPlotter.txtFileName.setText(logFileName);
+                        loggerPlotter.jtfFileName.setText(logFileName);
                         loggerPlotter.setFileLog(logFileName);
                         loggerPlotter.folder = newLogFile.getParent();
                         oldDirList = new LinkedList<>();
