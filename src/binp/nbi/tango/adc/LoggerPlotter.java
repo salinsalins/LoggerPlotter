@@ -399,9 +399,13 @@ public class LoggerPlotter extends WindowAdapter {
 
             ois.close();
 
-            LOGGER.info("Config restored.");
-        } catch (IOException | ClassNotFoundException e) {
-            LOGGER.log(Level.WARNING, "Config read error {0}", e);
+            LOGGER.fine("Config restored");
+        } catch (IOException | ClassNotFoundException ex) {
+            logFileName = "";
+            jtfFileName.setText("File not found");
+            logFile = new File("");
+            LOGGER.log(Level.WARNING, "Config read error");
+            LOGGER.log(Level.INFO, "Excption: ", ex);
         }
         
         restartTimerTask();
@@ -498,7 +502,6 @@ public class LoggerPlotter extends WindowAdapter {
             return;
         }
 
-        LOGGER.severe("aaaaa "+fileName);
         List<String> signalList = SignalPlotter.readSignalList(fileName);
 
         int n = jpMainPanel.getComponentCount();
@@ -728,6 +731,10 @@ public class LoggerPlotter extends WindowAdapter {
             }
 
             File logFile = new File(logFileName);
+            if (!logFile.exists()) {
+                LOGGER.info("Logfile does not exist");
+            	return;
+            }
             long logFileLength = logFile.length();
             if (logFileLength <= oldLogFileLength) {
                 return;
@@ -844,6 +851,10 @@ public class LoggerPlotter extends WindowAdapter {
                 }
 
                 File logFile = new File(logFileName);
+                if (!logFile.exists()) {
+                    LOGGER.info("Logfile does not exist");
+                	return null;
+                }
                 long logFileLength = logFile.length();
                 if (logFileLength <= oldLogFileLength) {
                     return null;
