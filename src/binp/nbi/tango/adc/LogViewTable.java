@@ -25,14 +25,13 @@ import javax.swing.table.TableModel;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import javax.swing.event.TableColumnModelEvent;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumnModel;
 
 public class LogViewTable extends JTable {
 
     private static final long serialVersionUID = 8656104666552673873L;
-    private static final Logger logger = Logger.getLogger(LogViewTable.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LogViewTable.class.getName());
 
     private String[] includedSignalNames = {"Time", "Shot", "U_ex", "I_ex",
         "U_tot", "I_ac"};
@@ -50,7 +49,7 @@ public class LogViewTable extends JTable {
 
     public LogViewTable() {
         super();
-        logger.setLevel(Level.FINE);
+        LOGGER.setLevel(Level.FINE);
 
         this.included = new LinkedList<>();
         this.included.addAll(Arrays.asList("Time", "Shot", "U_ex", "I_ex", "U_tot", "I_ac"));
@@ -59,8 +58,10 @@ public class LogViewTable extends JTable {
 
         setPreferredScrollableViewportSize(new Dimension(500, 70));
         setFillsViewportHeight(true);
+        // font for cells
         setFont(new Font("SansSerif", Font.PLAIN, 16));
         setRowHeight(25);
+        // font for headers
         getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 16));
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
@@ -73,13 +74,6 @@ public class LogViewTable extends JTable {
     public LogViewTable(File file) {
         this();
         readFile(file);
-    }
-
-    /**
-     * @return the includedSignalNames
-     */
-    public String[] getIncludedSignalNames() {
-        return includedSignalNames;
     }
 
     /**
@@ -148,7 +142,7 @@ public class LogViewTable extends JTable {
             columns.add(columnName);
             return true;
         }
-        // System.out.println("Column exists " + columnName + " " + i);
+        // System.out.println("Column " + columnName + " exists " + i);
         return false;
     }
 
@@ -285,9 +279,9 @@ public class LogViewTable extends JTable {
             bReader.close();
             scrollToLastRow();
         } catch (FileNotFoundException e) {
-            logger.log(Level.INFO, "File {0} not found", logFile.getAbsolutePath());
+            LOGGER.log(Level.INFO, "File {0} not found", logFile.getAbsolutePath());
         } catch (IOException e) {
-            logger.log(Level.INFO, "IOException ", e);
+            LOGGER.log(Level.INFO, "IOException ", e);
         }
     }
 
