@@ -342,7 +342,7 @@ public class LoggerPlotter extends WindowAdapter {
             }
 
             @Override
-            public void removeUpdate(DocumentEvent arg0) {
+            public void removeUpdate(DocumentEvent ev) {
                 //log.trace("Remove Update");
                 logViewTable.setExcludedSignalNames(jtaExcCol.getText());
                 logViewTable.refreshOnShow = true;
@@ -357,7 +357,6 @@ public class LoggerPlotter extends WindowAdapter {
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         njp_1.setBounds(5, 355, 360, 260);
         configPane.add(njp_1);
-
     }
     
     private void restartTimerTask() {
@@ -400,49 +399,49 @@ public class LoggerPlotter extends WindowAdapter {
             ois.close();
 
             LOGGER.fine("Config restored");
+	
+	        logViewTable.readFile(logFileName);
+	        logViewTable.setColumnNames(columnNames);
+	        // Add event listener for logview table
+	        ListSelectionModel lsm = logViewTable.getSelectionModel();
+	        lsm.addListSelectionListener(new ListSelectionListener() {
+	            @Override
+	            public void valueChanged(ListSelectionEvent event) {
+	                //Ignore extra messages.
+	                if (event.getValueIsAdjusting()) {
+	                    return;
+	                }
+	
+	                ListSelectionModel lsm = (ListSelectionModel) event.getSource();
+	                if (lsm.isSelectionEmpty()) {
+	                    //System.out.println("No rows selected.");
+	                } else {
+	                    int selectedRow = lsm.getMaxSelectionIndex();
+	                    //System.out.println("Row " + selectedRow + " is now selected.");
+	                    //String fileName = folder + "\\" + logViewTable.files.get(selectedRow);
+	                    try {
+	                        File zipFile = logViewTable.files.get(selectedRow);
+	                        readZipFile(zipFile);
+	                        if (timerTask != null && timerTask.timerCount > 0) {
+	                            dimLineColor();
+	                        }
+	                    } catch (Exception e) {
+	                        LOGGER.log(Level.WARNING, "Selection change exception ", e);
+	                    }
+	                }
+	            }
+	        });
+	        logViewTable.clearSelection();
+	        logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
+	        
+	        restartTimerTask();
         } catch (IOException | ClassNotFoundException ex) {
-            logFileName = "";
-            jtfFileName.setText("File not found");
+            timer.cancel();
+            jtfFileName.setText("");
             logFile = new File("");
             LOGGER.log(Level.WARNING, "Config read error");
             LOGGER.log(Level.INFO, "Excption: ", ex);
         }
-        
-        restartTimerTask();
-
-        logViewTable.readFile(logFileName);
-        logViewTable.setColumnNames(columnNames);
-        // Add event listener for logview table
-        ListSelectionModel lsm = logViewTable.getSelectionModel();
-        lsm.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent event) {
-                //Ignore extra messages.
-                if (event.getValueIsAdjusting()) {
-                    return;
-                }
-
-                ListSelectionModel lsm = (ListSelectionModel) event.getSource();
-                if (lsm.isSelectionEmpty()) {
-                    //System.out.println("No rows selected.");
-                } else {
-                    int selectedRow = lsm.getMaxSelectionIndex();
-                    //System.out.println("Row " + selectedRow + " is now selected.");
-                    //String fileName = folder + "\\" + logViewTable.files.get(selectedRow);
-                    try {
-                        File zipFile = logViewTable.files.get(selectedRow);
-                        readZipFile(zipFile);
-                        if (timerTask != null && timerTask.timerCount > 0) {
-                            dimLineColor();
-                        }
-                    } catch (Exception e) {
-                        LOGGER.log(Level.WARNING, "Selection change exception ", e);
-                    }
-                }
-            }
-        });
-        logViewTable.clearSelection();
-        logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
    }
 
     public void saveConfig() {
