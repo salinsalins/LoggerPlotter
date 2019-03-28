@@ -396,44 +396,58 @@ public class LoggerPlotter extends WindowAdapter {
     }
 
     public void restoreConfig() {
+        Rectangle bnds = new Rectangle(20, 20, 200, 200);
+        String lfn = "";
+        String fld = "";
+        String exc = "";
+        String inc = "";
+        boolean sm = false;
+        boolean sp = false;
+        List<String> cln = new ArrayList<String>();
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("config.dat"));
 
-            Rectangle bounds = (Rectangle) ois.readObject();
-            frame.setBounds(bounds);
+            bnds = (Rectangle) ois.readObject();
+            frame.setBounds(bnds);
 
-            String logFileName = (String) ois.readObject();
-            jtfFileName.setText(logFileName);
-            logFile = new File(logFileName);
+            lfn = (String) ois.readObject();
 
-            String str = (String) ois.readObject();
-            folder = str;
+            fld = (String) ois.readObject();
+            folder = fld;
 
-            str = (String) ois.readObject();
-            jtaExcCol.setText(str);
+            exc = (String) ois.readObject();
+            jtaExcCol.setText(exc);
 
-            str = (String) ois.readObject();
-            jtaIncCol.setText(str);
+            inc = (String) ois.readObject();
+            jtaIncCol.setText(inc);
 
-            boolean sm = (boolean) ois.readObject();
+            sm = (boolean) ois.readObject();
             jcbShowMarkers.setSelected(sm);
 
-            boolean sp = (boolean) ois.readObject();
+            sp = (boolean) ois.readObject();
             jcbShowPreviousShot.setSelected(sp);
             
-            List<String> columnNames = (List<String>) ois.readObject();
+            cln = (List<String>) ois.readObject();
 
             ois.close();
 
-            LOGGER.fine("Config restored");
-	
-	        logViewTable.readFile(logFileName);
-	        logViewTable.setColumnNames(columnNames);
-	        logViewTable.clearSelection();
-	        logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
+            logFile = new File(lfn);
+            if(logFile.exists()) {
+            	jtfFileName.setText(lfn);
+    	        logViewTable.readFile(lfn);
+    	        logViewTable.setColumnNames(cln);
+    	        logViewTable.clearSelection();
+    	        logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
+            }
+            else {
+            	logFile = null;
+            	jtfFileName.setText("");
+            }
 	        
 	        restartTimerTask();
-        } catch (IOException | ClassNotFoundException ex) {
+
+	        LOGGER.fine("Config restored");
+        } catch (Exception ex) {
         	// restore default config
             timer.cancel();
             jtfFileName.setText("");
