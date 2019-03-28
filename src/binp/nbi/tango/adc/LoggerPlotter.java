@@ -83,8 +83,8 @@ public class LoggerPlotter extends WindowAdapter {
 
     public static final String version = "4.0";
 
-    private File logFile;
-    private File zipFile;
+    private File logFile = null;
+    private File zipFile = null;
     private File rootFolder = new File(".\\");
 
     String folder = ".\\";
@@ -179,6 +179,35 @@ public class LoggerPlotter extends WindowAdapter {
                 //System.out.println(arg0.getButton());
                 if(arg0.getButton() != MouseEvent.BUTTON3) return;
                 logViewTable.saveAsCSV();
+            }
+        });
+        // Add event listener for logview table
+        ListSelectionModel lsm = logViewTable.getSelectionModel();
+        lsm.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent event) {
+                //Ignore extra messages.
+                if (event.getValueIsAdjusting()) {
+                    return;
+                }
+
+                ListSelectionModel lsm = (ListSelectionModel) event.getSource();
+                if (lsm.isSelectionEmpty()) {
+                    //System.out.println("No rows selected.");
+                } else {
+                    int selectedRow = lsm.getMaxSelectionIndex();
+                    //System.out.println("Row " + selectedRow + " is now selected.");
+                    //String fileName = folder + "\\" + logViewTable.files.get(selectedRow);
+                    try {
+                        File zipFile = logViewTable.files.get(selectedRow);
+                        readZipFile(zipFile);
+                        if (timerTask != null && timerTask.timerCount > 0) {
+                            dimLineColor();
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.WARNING, "Selection change exception ", ex);
+                    }
+                }
             }
         });
 
@@ -367,15 +396,13 @@ public class LoggerPlotter extends WindowAdapter {
     }
 
     public void restoreConfig() {
-        String logFileName = null;
-        List<String> columnNames = new LinkedList<>();
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("config.dat"));
 
             Rectangle bounds = (Rectangle) ois.readObject();
             frame.setBounds(bounds);
 
-            logFileName = (String) ois.readObject();
+            String logFileName = (String) ois.readObject();
             jtfFileName.setText(logFileName);
             logFile = new File(logFileName);
 
@@ -394,7 +421,7 @@ public class LoggerPlotter extends WindowAdapter {
             boolean sp = (boolean) ois.readObject();
             jcbShowPreviousShot.setSelected(sp);
             
-            columnNames = (List<String>) ois.readObject();
+            List<String> columnNames = (List<String>) ois.readObject();
 
             ois.close();
 
@@ -402,43 +429,16 @@ public class LoggerPlotter extends WindowAdapter {
 	
 	        logViewTable.readFile(logFileName);
 	        logViewTable.setColumnNames(columnNames);
-	        // Add event listener for logview table
-	        ListSelectionModel lsm = logViewTable.getSelectionModel();
-	        lsm.addListSelectionListener(new ListSelectionListener() {
-	            @Override
-	            public void valueChanged(ListSelectionEvent event) {
-	                //Ignore extra messages.
-	                if (event.getValueIsAdjusting()) {
-	                    return;
-	                }
-	
-	                ListSelectionModel lsm = (ListSelectionModel) event.getSource();
-	                if (lsm.isSelectionEmpty()) {
-	                    //System.out.println("No rows selected.");
-	                } else {
-	                    int selectedRow = lsm.getMaxSelectionIndex();
-	                    //System.out.println("Row " + selectedRow + " is now selected.");
-	                    //String fileName = folder + "\\" + logViewTable.files.get(selectedRow);
-	                    try {
-	                        File zipFile = logViewTable.files.get(selectedRow);
-	                        readZipFile(zipFile);
-	                        if (timerTask != null && timerTask.timerCount > 0) {
-	                            dimLineColor();
-	                        }
-	                    } catch (Exception e) {
-	                        LOGGER.log(Level.WARNING, "Selection change exception ", e);
-	                    }
-	                }
-	            }
-	        });
 	        logViewTable.clearSelection();
 	        logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
 	        
 	        restartTimerTask();
         } catch (IOException | ClassNotFoundException ex) {
+        	// restore default config
             timer.cancel();
             jtfFileName.setText("");
-            logFile = new File("");
+            logFile = null;
+            zipFile = null;
             LOGGER.log(Level.WARNING, "Config read error");
             LOGGER.log(Level.INFO, "Excption: ", ex);
         }
