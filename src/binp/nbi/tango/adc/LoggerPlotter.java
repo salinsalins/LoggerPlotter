@@ -438,6 +438,7 @@ public class LoggerPlotter extends WindowAdapter {
     	        logViewTable.setColumnNames(cln);
     	        logViewTable.clearSelection();
     	        logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
+    	        logViewTable.scrollToLastRow();
             }
             else {
             	logFile = null;
@@ -516,16 +517,29 @@ public class LoggerPlotter extends WindowAdapter {
         }
 
         List<String> signalList = SignalPlotter.readSignalList(fileName);
+        List<String> cols = logViewTable.getColumnNames();
+        List<String> labels = new ArrayList<String>();
+        List<String> ssig = new ArrayList<String>();
+
+        SignalChartPanel cp = new SignalChartPanel();
+        for (String s : signalList) {
+            cp.readParameters(fileName, s);
+            labels.add(cp.getLabel());
+        }
+
+        for (String c : cols) {
+            if (labels.contains(c)) ssig.add(signalList.get(labels.indexOf(c)));
+        }
 
         int n = jpMainPanel.getComponentCount();
         Component[] components = jpMainPanel.getComponents();
 
-        jpMainPanel.removeAll();
-        for (String str : signalList) {
+    	jpMainPanel.removeAll();
+        for (String s : ssig) {
             SignalChartPanel chart = new SignalChartPanel();
-            chart.readParameters(fileName, str);
+            chart.readParameters(fileName, s);
             if (logViewTable.findColumn(chart.getLabel()) >= 0) {
-                chart.readData(fileName, str);
+                chart.readData(fileName, s);
                 chart.setChartParam();
                 chart.setLineColor(2, colFresh);
                 chart.setPreferredSize(new Dimension(320, 250));
@@ -797,129 +811,4 @@ public class LoggerPlotter extends WindowAdapter {
             oldLogFileLength = logFileLength;
         }
     }
-
-    //**************************************************************************
-    class Task extends SwingWorker<Void, Void> {
-
-            LoggerPlotter loggerPlotter = null;
-            long timerCount = 0l;
-            long timerCountMax = 15000l;
-            String folder = "";
-            int oldnFiles = 0;
-            int nFiles = 0;
-            int count = 0;
-            long oldLogFileLength = 0;
-            List<String> dirList;
-            List<String> oldDirList;
-            int addedFiles = 0;
-            String logFileName;
-
-            Task(LoggerPlotter lp) {
-                loggerPlotter = lp;
-                timerCount = 0;
-                timerCountMax = 15;
-                folder = lp.folder;
-                File dir = new File(folder);
-                oldDirList = Arrays.asList(dir.list());
-                oldnFiles = oldDirList.size();
-                count = 0;
-                oldLogFileLength = 0;
-                logFileName = loggerPlotter.getLogFileName();
-            }
-
-            /**
-             * Main task. Executed in background thread.
-             */
-            @Override
-            public Void doInBackground() {
-                timerCount++;
-                //log.trace("Timer ", timerCount);
-
-                // Current log file name
-                logFileName = loggerPlotter.getLogFileName();
-                if (logFileName == null) {
-                    return null;
-                }
-                // Determine today log file name
-                String rootFolder = loggerPlotter.getRootFolderName();
-                String todayFolder = LoggerDumper.getLogFolderName();
-                String todayFile = LoggerDumper.getLogFileName();
-                String todayLogFileName = rootFolder + "\\" + todayFolder + "\\" + todayFile;
-
-                if (loggerPlotter.jcbAdjustForToday.isSelected() && !logFileName.equals(todayLogFileName)) {
-                    File newLogFile = new File(todayLogFileName);
-                    if (newLogFile.exists()) {
-                        LOGGER.log(Level.INFO, "Today log file found. Changing to {0}", todayLogFileName);
-                        logFileName = todayLogFileName;
-                        loggerPlotter.jtfFileName.setText(logFileName);
-                        loggerPlotter.setFileLog(logFileName);
-                        loggerPlotter.folder = newLogFile.getParent();
-                        oldDirList = new LinkedList<>();
-                        oldLogFileLength = 0;
-                        loggerPlotter.logViewTable.readFile(logFileName);
-                    }
-                }
-                if (loggerPlotter.checkLock()) {
-                    return null;
-                }
-
-                File logFile = new File(logFileName);
-                if (!logFile.exists()) {
-                    LOGGER.info("Logfile does not exist");
-                	return null;
-                }
-                long logFileLength = logFile.length();
-                if (logFileLength <= oldLogFileLength) {
-                    return null;
-                }
-                LOGGER.info("Logfile length has increaed.");
-                if (!logFile.canWrite()) {
-                    LOGGER.severe("Log file is not writable.");
-                    return null;
-                }
-
-                File dir = new File(loggerPlotter.folder);
-                String[] dirListArray = dir.list();
-                dirList = Arrays.asList(dirListArray);
-                nFiles = dirList.size();
-
-                addedFiles = 0;
-                for (String str : dirList) {
-                    if (!oldDirList.contains(str)) {
-                        if (str.endsWith(".zip")) {
-                            LOGGER.fine("Added zip file " + str);
-                            addedFiles++;
-                        }
-                    }
-                }
-
-                oldnFiles = nFiles;
-                oldDirList = dirList;
-                oldLogFileLength = logFileLength;
-
-                return null;
-            }
-
-            @Override
-            protected void process(List<Void> chunks) {
-                if (timerCount == timerCountMax) {
-                    loggerPlotter.dimLineColor();
-                    LOGGER.fine("Line color dimmed");
-                }
-                if (addedFiles > 0) {
-                    LOGGER.info("New files found. Replot.");
-                    timerCount = 0;
-                    loggerPlotter.logViewTable.readFile(logFileName);
-                }
-            }
-
-            /**
-             * Executed in event dispatching thread
-             */
-            @Override
-            public void done() {
-                //taskOutput.append("Done!\n");
-            }
-        }
-
 }
