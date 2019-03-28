@@ -4,3 +4,4 @@
 config.dat
 log.log
 /bin/
+/config.dat.old
