@@ -23,11 +23,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -43,7 +45,6 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -51,18 +52,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
-import java.util.logging.Logger;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager.LookAndFeelInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.DefaultXYDataset;
 
 import org.jfree.data.xy.XYSeries;
 
@@ -72,7 +61,7 @@ public class LoggerPlotter extends WindowAdapter {
     	System.setProperty("java.util.logging.SimpleFormatter.format",
                 "[%1$tF %1$tT] %4$-7s %2$s %5$s %6$s %n");
     }
-    private static final Logger LOGGER = Logger.getLogger(LoggerPlotter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LoggerPlotter.class.getPackage().getName());
     private static final ConsoleHandler handler = new ConsoleHandler();
     static {
     	LOGGER.addHandler(handler);
