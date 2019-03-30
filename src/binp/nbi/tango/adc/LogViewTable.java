@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,7 @@ import javax.swing.table.TableColumnModel;
 public class LogViewTable extends JTable {
 
     private static final long serialVersionUID = 8656104666552673873L;
-    private static final Logger LOGGER = Logger.getLogger(LogViewTable.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LogViewTable.class.getPackage().getName());
 
     private String[] includedSignalNames = {"Time", "Shot", "U_ex", "I_ex",
         "U_tot", "I_ac"};
@@ -43,9 +44,9 @@ public class LogViewTable extends JTable {
     private List<String> excluded;
 
     File logFile;
-    LinkedList<File> files;
-    LinkedList<String> shots;
-    LinkedList<String> columns;
+    LinkedList<File> files = new LinkedList<>();
+    LinkedList<String> shots = new LinkedList<>();
+    LinkedList<String> columns = new LinkedList<>();
 
     public LogViewTable() {
         super();
@@ -130,40 +131,35 @@ public class LogViewTable extends JTable {
     }
 
     public boolean addColumn(String columnName) {
+        return addColumn(columnName, null);
+    }
+
+    public boolean addColumn(String columnName, String cellValue) {
+        if (columnName == null) {
+            return false;
+        }
         columnName = columnName.trim();
-        if (columnName == null || "".equals(columnName)) {
+        if (columnName.isEmpty()) {
             return false;
         }
         DefaultTableModel model = (DefaultTableModel) getModel();
-        int i = model.findColumn(columnName);
-        if (i < 0) {
-            model.addColumn(columnName);
-            // System.out.println("Added column " + columnName);
-            columns.add(columnName);
-            return true;
-        }
-        // System.out.println("Column " + columnName + " exists " + i);
-        return false;
-    }
-
-    public void addColumn(String columnName, String cellValue) {
-        columnName = columnName.trim();
-        if (columnName == null || "".equals(columnName)) {
-            return;
-        }
-        DefaultTableModel model = (DefaultTableModel) getModel();
-        int row = model.getRowCount() - 1;
-        if (row < 0) {
-            model.addRow(new String[0]);
-            row = model.getRowCount() - 1;
-        }
+        int cc = model.getColumnCount();
+        int rc = model.getRowCount();
         int col = model.findColumn(columnName);
         if (col < 0) {
             model.addColumn(columnName);
             columns.add(columnName);
-            col = model.findColumn(columnName);
+            col = cc;
         }
-        setValueAt(cellValue.trim(), row, col);
+        if (cellValue == null) {
+            return true;
+        }
+        if (rc <= 0) {
+            model.addRow(new String[cc]);
+            rc = 1;
+        }
+        setValueAt(cellValue.trim(), rc-1, col);
+        return true;
     }
 
     public final void readFile(String fileName) {
@@ -186,9 +182,13 @@ public class LogViewTable extends JTable {
         }
 
         refreshOnShow = false;
-        files = new LinkedList<>();
-        shots = new LinkedList<>();
-        columns = new LinkedList<>();
+        files.clear();
+        shots.clear();
+        columns.clear();
+
+        String[] zipsInDir = logFile.getParentFile().list(new FilenameFilter() { 
+            public boolean accept(File dir, String filename) { 
+            	return filename.endsWith(".zip");            }                 });
 
         // Set new empty model
         DefaultTableModel model = new DefaultTableModel();
@@ -213,14 +213,9 @@ public class LogViewTable extends JTable {
 
             // Read log file line by line
             while ((line = bReader.readLine()) != null) {
-                // System.out.println(line);
-
-                // Split line to fields separated by Constants.LOG_DELIMETER
-                // ("; " by default)
+                // Split line to fields separated by Constants.LOG_DELIMETER ; by default
                 fields = line.split(Constants.LOG_DELIMETER);
-
-                // First field is the Date/Time of Shot in YYYY-MM-DD HH:mm:SS
-                // format
+                // First field is the Date/Time of Shot in YYYY-MM-DD HH:mm:SS format
                 if (fields.length > 1) {
                     // Add row to the model
                     model.addRow(new String[0]);
@@ -230,7 +225,8 @@ public class LogViewTable extends JTable {
                     // Split HH:mm:SS from Date/Time and add space in front for
                     // better look
                     nv = fields[0].split(" ");
-                    if (nv.length < 2) continue;
+                    if (nv.length < 2) 
+                    	continue;
                     addColumn("Time", " " + nv[1].trim());
 
                     // Iterate for other fields in the line
@@ -250,22 +246,18 @@ public class LogViewTable extends JTable {
                         nv[1] = nv[1].trim();
                         // System.out.println(nv[0] + " -- " + nv[1]);
 
-                        if (nv[0].equals("File")) {
-                            // log.trace(marks[i]);
-                            String zipFileName = new File(nv[1]).getName();
-                            File zipFile = new File(logFile.getParentFile(), zipFileName);
-                            if (zipFile.exists()) {
-                                // log.trace("Add zip file to list " +
-                                // zipFileName);
-                                files.set(files.size()-1, zipFile);
-                            }
-                        }
-
-                        if (nv[0].equals("Shot")) {
+                        if ("Shot".equals(nv[0])) {
                             if (shots.contains(nv[1]) && excludeDuplicateShots) {
                                 continue;
                             }
                             shots.set(shots.size()-1, nv[1]);
+                        }
+
+                        if ("File".equals(nv[0])) {
+                            if (StringArray.contains(zipsInDir, nv[1])) {
+                            	File zf = new File(logFile.getParentFile(), nv[1]);
+                                files.set(files.size()-1, zf);
+                            }
                         }
 
                         if (StringArray.contains(excludedSignalNames, nv[0])) {

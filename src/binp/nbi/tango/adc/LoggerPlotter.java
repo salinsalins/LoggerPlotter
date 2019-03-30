@@ -188,8 +188,8 @@ public class LoggerPlotter extends WindowAdapter {
                     //System.out.println("Row " + selectedRow + " is now selected.");
                     //String fileName = folder + "\\" + logViewTable.files.get(selectedRow);
                     try {
-                        File zipFile = logViewTable.files.get(selectedRow);
-                        readZipFile(zipFile);
+                        //File zipFile = logViewTable.files.get(selectedRow);
+                        readZipFile(logViewTable.files.get(selectedRow));
                         if (timerTask != null && timerTask.timerCount > 0) {
                             dimLineColor();
                         }
@@ -282,7 +282,7 @@ public class LoggerPlotter extends WindowAdapter {
                     timer = new Timer();
                     timer.schedule(timerTask, 2000, 1000);
 
-                    readZipFile(folder + "\\" + logViewTable.files.getLast().getName());
+                    readZipFile(folder + "\\" + logViewTable.files.getLast());
                 }
             }
         });
