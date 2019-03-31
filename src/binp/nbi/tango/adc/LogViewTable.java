@@ -402,25 +402,6 @@ public class LogViewTable extends JTable {
         return -1;
     }
 
-    public static void scrollTableTo(JTable table, int rowIndex, int colIndex) {
-        if (!(table.getParent() instanceof JViewport)) {
-            return;
-        }
-        JViewport viewport = (JViewport) table.getParent();
-        Rectangle rect = table.getCellRect(rowIndex, colIndex, true);
-        Point pt = viewport.getViewPosition();
-        rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-        viewport.scrollRectToVisible(rect);
-    }
-
-//    @Override
-//    public void columnMoved(TableColumnModelEvent e) {
-//        System.out.println("Column moved");
-//        System.out.println(e.getFromIndex());
-//        System.out.println(e.getToIndex());
-//        super.columnMoved(e);
-//    }
-
     @Override
     public String getValueAt(int i, int j) {
         Object o = super.getValueAt(i, j);

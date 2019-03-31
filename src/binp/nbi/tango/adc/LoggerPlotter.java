@@ -72,9 +72,9 @@ public class LoggerPlotter extends WindowAdapter {
 
     public static final String version = "4.0";
 
-    private File logFile = null;
-    private File zipFile = null;
-    private File rootFolder = new File(".\\");
+    File logFile = null;
+    File zipFile = null;
+    File rootFolder = new File(".\\");
 
     String folder = ".\\";
 
@@ -82,7 +82,10 @@ public class LoggerPlotter extends WindowAdapter {
     Timer timer = new Timer();
 
     static LoggerPlotter window;
-    private JFrame frame;
+    JFrame frame;
+    JTabbedPane tabbedPane;
+
+    
     JTextField jtfFileName;
     LogViewTable logViewTable;
     JPanel jpMainPanel;
@@ -140,28 +143,27 @@ public class LoggerPlotter extends WindowAdapter {
      */
     private void initialize() {
         frame = new JFrame();
-        //frame.setResizable(false);
         frame.setBounds(100, 100, 600, 600);
-        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.addWindowListener(this);
         frame.getContentPane().setLayout(new CardLayout(0, 0));
 
-        // Tabbed pane for Plot, ErorrList, Log, etc..
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        // main tabbed pane
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         frame.getContentPane().add(tabbedPane, "name_5266296004328937");
 
-        // Signals and Log Tab		
+        // 1st tab Signals and Log		
         JSplitPane splitPane = new JSplitPane();
         splitPane.setResizeWeight(0.9);
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         tabbedPane.addTab("Signals and Log", null, splitPane, null);
 
+        // logview table in scroll pane for bottom part
         JScrollPane scrollPane_0 = new JScrollPane();
         splitPane.setRightComponent(scrollPane_0);
-
         logViewTable = new LogViewTable();
         scrollPane_0.setViewportView(logViewTable);
+        // Add event listener for logview table
         logViewTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
@@ -170,7 +172,6 @@ public class LoggerPlotter extends WindowAdapter {
                 logViewTable.saveAsCSV();
             }
         });
-        // Add event listener for logview table
         ListSelectionModel lsm = logViewTable.getSelectionModel();
         lsm.addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -181,28 +182,24 @@ public class LoggerPlotter extends WindowAdapter {
                 }
 
                 ListSelectionModel lsm = (ListSelectionModel) event.getSource();
-                if (lsm.isSelectionEmpty()) {
-                    //System.out.println("No rows selected.");
-                } else {
+                if (!lsm.isSelectionEmpty()) {
                     int selectedRow = lsm.getMaxSelectionIndex();
-                    //System.out.println("Row " + selectedRow + " is now selected.");
-                    //String fileName = folder + "\\" + logViewTable.files.get(selectedRow);
                     try {
-                        //File zipFile = logViewTable.files.get(selectedRow);
                         readZipFile(logViewTable.files.get(selectedRow));
                         if (timerTask != null && timerTask.timerCount > 0) {
                             dimLineColor();
                         }
                     } catch (Exception ex) {
-                        LOGGER.log(Level.WARNING, "Selection change exception ", ex);
+                        LOGGER.log(Level.WARNING, "Selection change exception ");
+                        LOGGER.log(Level.INFO, "Exception: ", ex);
                     }
                 }
             }
         });
 
+        // signal plots in scroll pane for top part
         JScrollPane scrollPane_1 = new JScrollPane();
         splitPane.setLeftComponent(scrollPane_1);
-
         jpMainPanel = new JPanel();
         jpMainPanel.setLayout(new GridLayout(0, 3, 5, 5));
         scrollPane_1.setViewportView(jpMainPanel);
@@ -212,17 +209,17 @@ public class LoggerPlotter extends WindowAdapter {
         lblZipFileName.setFont(new Font("Tahoma", Font.PLAIN, 16));
         scrollPane_1.setColumnHeaderView(lblZipFileName);
 
-        splitPane.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent arg0) {
-                //System.out.println("Show " + logViewTable.refreshOnShow);
-                if (!logViewTable.refreshOnShow) {
-                    return;
-                }
-                logViewTable.readFile(logViewTable.logFile);
-                //log.trace("Reread file for logViewTable");
-            }
-        });
+//        splitPane.addComponentListener(new ComponentAdapter() {
+//            @Override
+//            public void componentShown(ComponentEvent arg0) {
+//                System.out.println("Show " + logViewTable.refreshOnShow);
+//                if (!logViewTable.refreshOnShow) {
+//                    return;
+//                }
+//                logViewTable.readFile(logViewTable.logFile);
+//                //log.trace("Reread file for logViewTable");
+//            }
+//        });
     
         // Config Tab		
         JPanel configPane = new JPanel();
@@ -517,7 +514,8 @@ public class LoggerPlotter extends WindowAdapter {
         }
 
         for (String c : cols) {
-            if (labels.contains(c)) ssig.add(signalList.get(labels.indexOf(c)));
+            if (labels.contains(c)) 
+            	ssig.add(signalList.get(labels.indexOf(c)));
         }
 
         int n = jpMainPanel.getComponentCount();
@@ -568,7 +566,7 @@ public class LoggerPlotter extends WindowAdapter {
 
                     int m = 250;
                     double[] hyst = new double[m + 1];
-                    double delta = (prevSignal.getMaxY() - prevSignal.getMinY()) / m;
+                    double delta = (prevSignal.getMaxY() - min) / m;
 
                     double sum = 0.0;
                     double count = 0.0;
@@ -593,7 +591,7 @@ public class LoggerPlotter extends WindowAdapter {
                 jpMainPanel.add(chart);
             }
         }
-        jpMainPanel.updateUI();
+        //jpMainPanel.updateUI();
         lblZipFileName.setText("File : " + fileName);
     }
 
@@ -640,14 +638,6 @@ public class LoggerPlotter extends WindowAdapter {
     public String getRootFolderName() {
         File logFile = new File(getLogFileName());
         return logFile.getParentFile().getParentFile().getParentFile().getParent();
-    }
-
-    public File getFileLog() {
-        return logFile;
-    }
-
-    public void setFileLog(File file) {
-        logFile = file;
     }
 
     public void setFileLog(String fileName) {
