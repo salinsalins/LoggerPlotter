@@ -593,6 +593,7 @@ public class LoggerPlotter extends WindowAdapter {
         }
         //jpMainPanel.updateUI();
         lblZipFileName.setText("File : " + fileName);
+        logViewTable.scrollToSelection();
     }
 
     List<String> listDirectory(File dir, String extension) {

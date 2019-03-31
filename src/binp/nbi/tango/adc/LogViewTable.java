@@ -294,17 +294,23 @@ public class LogViewTable extends JTable {
     }
     
     public void scrollTo() {
-        int lastRow = getRowCount() - 1;
-        if (lastRow >= 0) {
-            scrollTo(lastRow, 0);
+        int row = getRowCount() - 1;
+        if (row >= 0) {
+            scrollTo(row, 0);
         }
     }
 
+    public void scrollToSelection() {
+        int row = getSelectedRow();
+        if (row >= 0) {
+            scrollTo(row, 0);
+        }
+    }
     public void scrollToLastRow() {
         int lastRow = getRowCount() - 1;
         if (lastRow >= 0) {
             scrollTo(lastRow, 0);
-            setRowSelectionInterval(lastRow, lastRow);
+            //setRowSelectionInterval(lastRow, lastRow);
         }
     }
 
