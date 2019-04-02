@@ -279,7 +279,8 @@ public class LoggerPlotter extends WindowAdapter {
                     timer = new Timer();
                     timer.schedule(timerTask, 2000, 1000);
 
-                    readZipFile(folder + "\\" + logViewTable.files.getLast());
+                    //readZipFile(folder + "\\" + logViewTable.files.getLast());
+                    readZipFile(logViewTable.files.getLast());
                 }
             }
         });
@@ -323,14 +324,14 @@ public class LoggerPlotter extends WindowAdapter {
             public void insertUpdate(DocumentEvent ev) {
                 //log.trace("Insert Update");
                 logViewTable.setIncludedSignalNames(jtaIncCol.getText());
-                logViewTable.refreshOnShow = true;
+//                logViewTable.refreshOnShow = true;
             }
 
             @Override
             public void removeUpdate(DocumentEvent arg0) {
                 //log.trace("Remove Update");
                 logViewTable.setIncludedSignalNames(jtaIncCol.getText());
-                logViewTable.refreshOnShow = true;
+//                logViewTable.refreshOnShow = true;
             }
         });
         jtaIncCol.setText("Time\nShot\nU_ex");
@@ -353,14 +354,14 @@ public class LoggerPlotter extends WindowAdapter {
             public void insertUpdate(DocumentEvent ev) {
                 //log.trace("Insert Update");
                 logViewTable.setExcludedSignalNames(jtaExcCol.getText());
-                logViewTable.refreshOnShow = true;
+//                logViewTable.refreshOnShow = true;
             }
 
             @Override
             public void removeUpdate(DocumentEvent ev) {
                 //log.trace("Remove Update");
                 logViewTable.setExcludedSignalNames(jtaExcCol.getText());
-                logViewTable.refreshOnShow = true;
+//                logViewTable.refreshOnShow = true;
             }
         });
         jtaExcCol.setText("File\nRF_PHASE\nS_C1(A)");
@@ -708,8 +709,11 @@ public class LoggerPlotter extends WindowAdapter {
             }
             // Current log file name
             String logFileName = loggerPlotter.getLogFileName();
-            //log.trace("Log file name " + logFileName);
             if (logFileName == null) {
+                return;
+            }
+
+            if (loggerPlotter.checkLock()) {
                 return;
             }
 
@@ -733,6 +737,7 @@ public class LoggerPlotter extends WindowAdapter {
                     loggerPlotter.logViewTable.readFile(logFileName);
                 }
             }
+
             if (loggerPlotter.checkLock()) {
                 return;
             }
@@ -747,11 +752,15 @@ public class LoggerPlotter extends WindowAdapter {
                 return;
             }
             LOGGER.info("Logfile length has increaed.");
-            try {
-                FileWriter fw = new FileWriter(logFile, true);
-                fw.close();
-            } catch (IOException e) {
-                LOGGER.info("Log file is not writable.");
+//            try {
+//                FileWriter fw = new FileWriter(logFile, true);
+//                fw.close();
+//            } catch (IOException e) {
+//                LOGGER.info("Log file is not writable.");
+//                return;
+//            }
+
+            if (loggerPlotter.checkLock()) {
                 return;
             }
 

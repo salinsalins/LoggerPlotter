@@ -38,7 +38,7 @@ public class LogViewTable extends JTable {
         "U_tot", "I_ac"};
     private String[] excludedSignalNames = {"File", "RF_PHASE", "S_C1(A)"};
     boolean excludeDuplicateShots = false;
-    boolean refreshOnShow = false;
+//    boolean refreshOnShow = false;
 
     private List<String> included;
     private List<String> excluded;
@@ -175,13 +175,13 @@ public class LogViewTable extends JTable {
     }
 
     public void readFile() {
-        if (!isShowing()) {
+//        if (!isShowing()) {
             // log.trace("Table is Hidden");
-            refreshOnShow = true;
-            return;
-        }
+//            refreshOnShow = true;
+//            return;
+//        }
 
-        refreshOnShow = false;
+//        refreshOnShow = false;
         files.clear();
         shots.clear();
         columns.clear();
@@ -306,6 +306,7 @@ public class LogViewTable extends JTable {
             scrollTo(row, 0);
         }
     }
+    
     public void scrollToLastRow() {
         int lastRow = getRowCount() - 1;
         if (lastRow >= 0) {
