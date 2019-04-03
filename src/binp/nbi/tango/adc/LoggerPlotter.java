@@ -154,7 +154,7 @@ public class LoggerPlotter extends WindowAdapter {
 
         // 1st tab Signals and Log		
         JSplitPane splitPane = new JSplitPane();
-        splitPane.setResizeWeight(0.9);
+        splitPane.setResizeWeight(1.0);
         splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         tabbedPane.addTab("Signals and Log", null, splitPane, null);
 

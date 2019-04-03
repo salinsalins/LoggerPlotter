@@ -57,8 +57,8 @@ public class LogViewTable extends JTable {
         this.excluded = new LinkedList<>();
         this.excluded.addAll(Arrays.asList("File", "RF_PHASE", "S_C1(A)"));
 
-        setPreferredScrollableViewportSize(new Dimension(500, 70));
-        setFillsViewportHeight(true);
+        //setPreferredScrollableViewportSize(new Dimension(500, 70));
+        //setFillsViewportHeight(true);
         // font for cells
         setFont(new Font("SansSerif", Font.PLAIN, 16));
         setRowHeight(25);
