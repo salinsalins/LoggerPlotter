@@ -41,8 +41,6 @@ public class LogViewTable extends JTable {
     boolean excludeDuplicateShots = false;
 //    boolean refreshOnShow = false;
 
-    private boolean paintFlag = true;
-    
     private List<String> included;
     private List<String> excluded;
 
@@ -198,12 +196,10 @@ public class LogViewTable extends JTable {
         clearSelection();
         
         //DefaultTableModel model = new DefaultTableModel();
-        paintFlag = false;
         DefaultTableModel model = (DefaultTableModel) getModel();
         model.setRowCount(0);
         model.setColumnCount(0);
         //setModel(model);
-        paintFlag = true;
 
         // Add first column "Time"
         addColumn("Time");
@@ -290,12 +286,6 @@ public class LogViewTable extends JTable {
         }
     }
 
-    @Override
-    public void paint(Graphics g) {
-    	// TODO Auto-generated method stub
-    	if(paintFlag) super.paint(g);
-    }
-    
     public void scrollTo(int row, int col) {
        if (!(getParent() instanceof JViewport)) {
             return;

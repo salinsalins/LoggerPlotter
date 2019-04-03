@@ -590,6 +590,30 @@ public class LoggerPlotter extends WindowAdapter {
                     jpMainPanel.add(chartHyst);
                 }
 
+                if (chart.getLabel().equals("Tank_vacuum")) {
+                    prevSignal = chart.getSeries(2);
+                    SignalChartPanel chartPress = new SignalChartPanel();
+                    n = prevSignal.getItemCount();
+                	double ymin = prevSignal.getMinY();
+                    XYSeries series = new XYSeries("Pressure");
+                    double sum = 0.0;
+                    double count = 0.0;
+                    for (int i = 0; i < n; i++) {
+                        sum += Math.pow(10.0, (((double) prevSignal.getY(i))+0.861)*1.667-11.15897);
+                    	count++;
+                    	if( count >= 20.0) {
+                    		series.add(prevSignal.getX(i), sum/count);
+                    		sum = 0.0;
+                    		count = 0;
+                    	}
+                    }
+
+                    chartPress.addSeries(series);
+                    chartPress.setLineColor(0, Color.ORANGE);                    chartPress.getChart().setTitle("Pressure");
+                    chartPress.setYTitle("Pressure, Torr");
+                    jpMainPanel.add(chartPress);
+                }
+
                 jpMainPanel.add(chart);
             }
         }
