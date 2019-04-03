@@ -281,6 +281,7 @@ public class LoggerPlotter extends WindowAdapter {
 
                     //readZipFile(folder + "\\" + logViewTable.files.getLast());
                     readZipFile(logViewTable.files.getLast());
+        	        logViewTable.changeSelection(logViewTable.getRowCount()-1, 0, false, false);
                 }
             }
         });

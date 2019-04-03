@@ -4,6 +4,7 @@ import binp.nbi.tango.util.Constants;
 import binp.nbi.tango.util.StringArray;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
@@ -40,6 +41,8 @@ public class LogViewTable extends JTable {
     boolean excludeDuplicateShots = false;
 //    boolean refreshOnShow = false;
 
+    private boolean paintFlag = true;
+    
     private List<String> included;
     private List<String> excluded;
 
@@ -65,6 +68,7 @@ public class LogViewTable extends JTable {
         // font for headers
         getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 16));
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        setModel(new DefaultTableModel());
     }
 
     public LogViewTable(String fileName) {
@@ -191,8 +195,15 @@ public class LogViewTable extends JTable {
             	return filename.endsWith(".zip");            }                 });
 
         // Set new empty model
-        DefaultTableModel model = new DefaultTableModel();
-        setModel(model);
+        clearSelection();
+        
+        //DefaultTableModel model = new DefaultTableModel();
+        paintFlag = false;
+        DefaultTableModel model = (DefaultTableModel) getModel();
+        model.setRowCount(0);
+        model.setColumnCount(0);
+        //setModel(model);
+        paintFlag = true;
 
         // Add first column "Time"
         addColumn("Time");
@@ -269,7 +280,9 @@ public class LogViewTable extends JTable {
                 }
             }
             bReader.close();
+	        changeSelection(getRowCount()-1, 0, false, false);
             scrollToLastRow();
+            
         } catch (FileNotFoundException e) {
             LOGGER.log(Level.INFO, "File {0} not found", logFile.getAbsolutePath());
         } catch (IOException e) {
@@ -277,6 +290,12 @@ public class LogViewTable extends JTable {
         }
     }
 
+    @Override
+    public void paint(Graphics g) {
+    	// TODO Auto-generated method stub
+    	if(paintFlag) super.paint(g);
+    }
+    
     public void scrollTo(int row, int col) {
        if (!(getParent() instanceof JViewport)) {
             return;
